@@ -1,0 +1,253 @@
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
+    <link rel='stylesheet' href='/stylesheets/_bootstrap.css'/>
+
+    <script src="/javascripts/jquery-3.3.1.min.js"></script>
+    <script src="/javascripts/bootstrap.bundle.js"></script>
+
+    <script>
+        function setAlphaText() {
+            var alphaValue = document.getElementById('alpha').value;
+            document.getElementById('alphaValue').innerHTML = "0." + alphaValue;
+        }
+
+        function setBetaText() {
+            var betaValue = document.getElementById('beta').value;
+            document.getElementById('betaValue').innerHTML = "0." + betaValue;
+        }
+
+        $(document).ready(function() {
+
+            $("#accordion").css("display", "none");
+
+            $("#relation-extraction-form").submit(function (event) {
+                event.preventDefault();
+                $("#accordion").css("display", "none");
+                ajaxRapid();
+            });
+            
+            function ajaxRapid() {
+                var formData = {
+                    context : $("#context").val(),
+                    alpha : ($("#alpha").val()) / 10,
+                    beta : ($("#beta").val()) / 10,
+                    embedding : $("select[name=embedding]").val()
+                }
+
+                // POST call
+                $.ajax({
+                    type: "POST",
+                    url: "/api/re",
+                    data: formData,
+                    success: function(result) {
+                        result = $.parseJSON(result.body);
+                        var entities = result.entities;
+                        var relations = result.relations;
+                        var corefSentences = result.corefSentences;
+
+                        var entitiesHTML = "";
+                        $.each(entities, function() {
+                            entitiesHTML = entitiesHTML + "<tr>\n" +
+                            "        <td>" + this + "</td>\n" +
+                            "      </tr>";
+                        });
+                        document.getElementById('entities-tbody').innerHTML = entitiesHTML;
+
+                        var corefHTML = "";
+                        $.each(corefSentences, function() {
+                            corefHTML = corefHTML + "<tr>\n" +
+                                "        <td>" + this + "</td>\n" +
+                                "      </tr>";
+                        });
+                        document.getElementById('coref-sent-tbody').innerHTML = corefHTML;
+
+                        var relationsHTML = "";
+                        $.each(relations, function (){
+                            var obj = this.obj;
+                            var subj = this.subj;
+                            var property = this.property;
+
+                            relationsHTML = relationsHTML + "<tr>\n" +
+                            "        <td>" + subj + "</td>\n" +
+                            "        <td>" + property + "</td>\n" +
+                            "        <td>" + obj + "</td>\n" +
+                            "      </tr>";
+                        })
+                        document.getElementById('relations-tbody').innerHTML = relationsHTML;
+
+                        $("#accordion").css("display", "block");
+                    },
+                    error: function(xhr, status, error) {
+                        //swal(error);
+                        alert("Error!")
+                    }
+                });
+            }
+        });
+    </script>
+</head>
+
+<body class="d-flex flex-column">
+<nav class="py-2 navbar navbar-expand-lg navbar-light nav-bg-dark">
+    <div class="container">
+        <a class="nav-bar-text" href="#">RAPID</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
+                    <!-- Here's the magic. Add the .animate and .slide-in classes to your .dropdown-menu and you're all set! -->
+                    <div class="dropdown-menu dropdown-menu-right animate slideIn" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#">Fork Me</a>
+                        <a class="dropdown-item" href="#">Wiki</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="https://dice.cs.uni-paderborn.de/publications/">DICE Research Group</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div id="page-content">
+    <br>
+    <div class="container">
+        <div class="container curve-box">
+            <form id="relation-extraction-form">
+                <div style="margin-top: 5px;" class="row">
+                    <div class="container col-md-6">
+                        <div class="row">
+                            <div class="col-md-2"><p>Alpha:</p></div>
+                            <div class="col-md-1"><span id="alphaValue">0.4</span></div>
+                            <div class="col-md-9">
+                                <input type="range" min="1" max="9" value="4" class="slider" id="alpha" onchange="setAlphaText();">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2"><p>Beta:</p></div>
+                            <div class="col-md-1"><span id="betaValue">0.7</span></div>
+                            <div class="col-md-9">
+                                <input type="range" min="1" max="9" value="7" class="slider" id="beta" onchange="setBetaText();">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container col-md-6">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <label for="embedding">Semantic Embedding:</label>
+                            </div>
+                            <div class="col-md-7">
+                                <select class="form-control" name="embedding" id="embedding">
+                                    <option value="w2v">Word2Vec</option>
+                                    <option value="glove">Glove</option>
+                                    <option value="ft">FastText</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-5"></div>
+                            <div class="col-md-7">
+                                <button type="submit" style="margin-top: 2px;" class="btn btn-success">Extract Relations</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 5px;" class="row">
+                    <div class="container">
+                        <textarea style="background-color: #f5fff994;" class="form-control" rows="5" id="context">Ahmed was born in Pakistan. He raised his son named Ali. Ali graduated from the University of Saarland. He now works at Microsoft as a software engineer. Brad Smith is Microsoft's president and chief legal officer. It's office is located in Washington.</textarea>
+                    </div>
+                </div>
+
+                <div class="dropdown-divider"></div>
+
+                <div class="panel-group" id="accordion">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#relationsExtracted">Relations Extracted</a>
+                            </h4>
+                        </div>
+                        <div id="relationsExtracted" class="panel-collapse collapse in">
+                            <div class="panel-body">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th><i>Subject</i></th>
+                                            <th><i>Object</i></th>
+                                            <th><i>Predicate</i></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="relations-tbody">
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#entitiesRecognized">Entities Recognized</a>
+                            </h4>
+                        </div>
+                        <div id="entitiesRecognized" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th><i>Entities</i></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="entities-tbody">
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#corefSentences">Sentences After Coreferencing</a>
+                            </h4>
+                        </div>
+                        <div id="corefSentences" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th><i>Sentences after replacing mentions</i></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="coref-sent-tbody">
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<footer id="sticky-footer" class="py-2 bg-dark text-white-50">
+    <div class="container text-center">
+        <small>Demo of <a style="color: white" href="https://github.com/danishahmed92"><i>Danish Ahmed's</i></a> master thesis under the supervision of:
+            <i><a style="color: white" href="http://aksw.org/RicardoUsbeck.html">Dr. Ricardo Usbeck</a>,
+                <a style="color: white" href="http://aksw.org/MichaelRoeder.html">Michael Röder</a></i>.</small>
+        <br>
+        <small>Submitted to <i><a style="color: white" href="http://aksw.org/AxelNgonga.html">Prof. Dr. Axel-Cyrille Ngonga Ngomo</a></i></small>
+    </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,145 @@
+/* START COPY: https://startbootstrap.com/snippets/animated-navbar-dropdown/ */
+
+#navbarDropdown {
+    color: white;
+}
+
+.nav-bg-dark {
+    background-color: #20364c;
+}
+
+.nav-bar-text {
+    color: white;
+    font-size: x-large;
+}
+
+@media (min-width: 992px) {
+  .animate {
+    animation-duration: 0.3s;
+    -webkit-animation-duration: 0.3s;
+    animation-fill-mode: both;
+    -webkit-animation-fill-mode: both;
+  }
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateY(1rem);
+    opacity: 0;
+  }
+  100% {
+    transform:translateY(0rem);
+    opacity: 1;
+  }
+  0% {
+    transform: translateY(1rem);
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes slideIn {
+  0% {
+    -webkit-transform: transform;
+    -webkit-opacity: 0;
+  }
+  100% {
+    -webkit-transform: translateY(0);
+    -webkit-opacity: 1;
+  }
+  0% {
+    -webkit-transform: translateY(1rem);
+    -webkit-opacity: 0;
+  }
+}
+
+.slideIn {
+  -webkit-animation-name: slideIn;
+  animation-name: slideIn;
+}
+
+body {
+  background: linear-gradient(to right, #34506b, #bed7e8);
+}
+
+#sticky-footer {
+    flex-shrink: none;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+#page-content {
+    flex: 1 0 auto;
+}
+
+/* END COPY */
+
+.curve-box {
+    border-radius: 10px;
+    border: 2px solid #6c757d;
+    background: white;
+}
+
+/* SLIDER COPY */
+
+/*.slidecontainer {
+    width: 100%;
+}*/
+
+.slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 7px;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.slider:hover {
+    opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #303488;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #303488;
+    cursor: pointer;
+}
+
+/* END Slider copy */
+
+#alphaValue {
+    font-style: italic;
+}
+
+#betaValue {
+    font-style: italic;
+}
+
+.panel-default > .panel-heading {
+    background-color: #cfe8d8 !important;
+    color: #0f4415 !important;
+}
+
+.panel-default > .panel-heading + .panel-collapse > .panel-body {
+    background-color: #f5fff994 !important;
+}
