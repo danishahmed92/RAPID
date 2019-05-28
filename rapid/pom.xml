@@ -80,11 +80,27 @@
         </dependency>
         <!-- STANFORD CORENLP END -->
 
-        <!--<dependency>
-            <groupId>uk.ac.shef.wit</groupId>
-            <artifactId>simmetrics</artifactId>
-            <version>1.6.2</version>
-        </dependency>-->
+        <!-- Elaseticsearch START -->
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>6.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>transport</artifactId>
+            <version>6.4.0</version>
+        </dependency>
+        <!-- Elaseticsearch END -->
+
+        <!-- for cleaning wikipedia to plain text -->
+        <dependency>
+            <groupId>org.wikiclean</groupId>
+            <artifactId>wikiclean</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <!-- WikiClean END -->
+
 
         <dependency>
             <groupId>com.github.mpkorstanje</groupId>

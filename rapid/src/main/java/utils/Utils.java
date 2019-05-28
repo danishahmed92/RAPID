@@ -3,6 +3,7 @@ package utils;
 import config.IniConfig;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.*;
@@ -61,6 +62,12 @@ public class Utils {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void createFolderIfNotExist(String directoryPath) {
+        File directory = new File(directoryPath);
+        if (!directory.exists())
+            directory.mkdir();
     }
 
     public static String filterAlphaNum (String str) {

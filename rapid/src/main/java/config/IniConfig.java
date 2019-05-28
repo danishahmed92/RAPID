@@ -17,6 +17,16 @@ public class IniConfig {
         }
     }
 
+    public String wikiFolder;
+
+    public String esIp;
+    public int esPort;
+    public String esDataset;
+    public String esDSType;
+
+    public String sparql;
+    public int numRelationsPerProperty;
+
     public String stopWords;
     public String wordNet;
     public String resultPath;
@@ -44,6 +54,16 @@ public class IniConfig {
     private IniConfig() throws IOException {
         String CONFIG_FILE = "systemConfig.ini";
         Ini configIni = new Ini(IniConfig.class.getClassLoader().getResource(CONFIG_FILE));
+
+        wikiFolder = configIni.get("data", "wikiFolder");
+
+        esIp = configIni.get("elasticSearch", "ip");
+        esPort = Integer.parseInt(configIni.get("elasticSearch", "port"));
+        esDataset = configIni.get("elasticSearch", "indexDataset");
+        esDSType = configIni.get("elasticSearch", "indexType");
+
+        sparql = configIni.get("environment", "sparql");
+        numRelationsPerProperty = Integer.parseInt(configIni.get("environment", "numRelationsPerProperty"));
 
         stopWords = configIni.get("data", "stopWords");
         wordNet = configIni.get("data", "wordNet");
