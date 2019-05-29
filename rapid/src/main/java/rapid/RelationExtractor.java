@@ -10,7 +10,7 @@ import pattern.Pattern;
 import pattern.PatternGenerator;
 import rapid.rules.PropertyFiltrationRules;
 import rapid.score.PatternScore;
-import rapid.score.ValidatingThreshold;
+import rapid.score.EmpiricalThresholdHelper;
 import wordembedding.model.GeneratedModelClassification;
 
 import java.sql.SQLException;
@@ -369,7 +369,7 @@ public class RelationExtractor {
                         predictionDetailMap.put("embedding", ps.getPredictionDetailMap().get("embedding"));
 
                         double confidence = Double.parseDouble(ps.getPredictionDetailMap().get("confidence"));
-                        double threshold = ValidatingThreshold.getThreshold(alpha, beta, embeddingClassifier.classifierName, predictedProperty);
+                        double threshold = EmpiricalThresholdHelper.getThreshold(alpha, beta, embeddingClassifier.classifierName, predictedProperty);
 
                         if (confidence < threshold)
                             continue;
