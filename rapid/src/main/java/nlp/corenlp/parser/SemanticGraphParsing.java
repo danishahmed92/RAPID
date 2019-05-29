@@ -62,10 +62,20 @@ public class SemanticGraphParsing {
         add("punct");
     }};
 
+    /**
+     *
+     * @param semanticGraph semantic graph from annotation
+     * @return IndexWord root nodes of semantic graph
+     */
     public Collection<IndexedWord> getRoots(SemanticGraph semanticGraph) {
         return semanticGraph.getRoots();
     }
 
+    /**
+     *
+     * @param semanticGraph semantic graph from annotation
+     * @return returns the nodes that can be traversed using root node (out edges)
+     */
     public HashMap<IndexedWord, List<SemanticGraphEdge>> getOutEdgesFromRoots (SemanticGraph semanticGraph) {
         HashMap<IndexedWord, List<SemanticGraphEdge>> rootOutEdgesMap = new LinkedHashMap<IndexedWord, List<SemanticGraphEdge>>();
         Collection<IndexedWord> roots = this.getRoots(semanticGraph);
@@ -77,6 +87,13 @@ public class SemanticGraphParsing {
         return rootOutEdgesMap;
     }
 
+    /**
+     *
+     * @param originalSG semantic graph from annotation created from sentence (data collection)
+     * @param source source node in SG
+     * @param target target node in SG
+     * @return creates new semantic graph based on the shortest path between source and target node
+     */
     public SemanticGraph getGraphBetweenNodes(SemanticGraph originalSG, IndexedWord source, IndexedWord target) {
         List<SemanticGraphEdge> edgePath = originalSG.getShortestUndirectedPathEdges(source, target);
         SemanticGraph semanticGraph = new SemanticGraph();
@@ -144,6 +161,14 @@ public class SemanticGraphParsing {
         return semanticGraph;
     }
 
+    /**
+     * this method is used if root cannot be created on new SG from "getGraphBetweenNodes" method
+     * then it selects the root from original SG and get path to each source and target node
+     * @param semanticGraph original semantic graph
+     * @param source source node in SG
+     * @param target target node in SG
+     * @return creates new semantic graph; selects the root from original SG and get path to each source and target node
+     */
     public SemanticGraph generateSemanticGraphFromRoot(SemanticGraph semanticGraph, IndexedWord source, IndexedWord target) {
         Collection<IndexedWord> roots = semanticGraph.getRoots();
         if (roots == null || roots.size() == 0)
@@ -171,6 +196,11 @@ public class SemanticGraphParsing {
         return sg;
     }
 
+    /**
+     * checks the node that has outgoing edges but no incoming edges and mark it as root node
+     * @param semanticGraph new semantic graph
+     * @return root node of SG
+     */
     public IndexedWord getRootWord(SemanticGraph semanticGraph) {
         // has no incoming edge but has outgoing edges
         IndexedWord root = null;
@@ -193,6 +223,11 @@ public class SemanticGraphParsing {
         return root;
     }
 
+    /**
+     *
+     * @param sgsGeneratedFromSameSubjObj set of SG generated using source and target nodes
+     * @return keeps and return only distinct generated semantic graphs
+     */
     public Set<SemanticGraph> removeDuplicatedGraphs(Set<SemanticGraph> sgsGeneratedFromSameSubjObj) {
         Set<SemanticGraph> filteredGraphs = new HashSet<>();
         Set<IndexedWord> distinctRoots = new HashSet<>();
@@ -220,6 +255,12 @@ public class SemanticGraphParsing {
         return filteredGraphs;
     }
 
+    /**
+     * finds the nodes that are not connected to the graph
+     * @param semanticGraph semantic graph
+     * @param root root of SG
+     * @return set of nodes that are not connected from root node (so these nodes can be deleted)
+     */
     public Set<IndexedWord> getRootLessNodes(SemanticGraph semanticGraph, IndexedWord root) {
         Set<IndexedWord> allIWFromRoot = semanticGraph.vertexSet();
         Set<IndexedWord> rootLessNodes = new HashSet<>();

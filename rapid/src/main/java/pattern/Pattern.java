@@ -41,6 +41,14 @@ public class Pattern {
     public Set<String> distinctNouns = new HashSet<>();
     public Set<String> distinctVerbs = new HashSet<>();
 
+    /**
+     *
+     * @param root root of pattern
+     * @param mergePatternStr combined string (subjPath, root, ObjPath)
+     * @param mergePatternExt combined string extended with labels (subjPath, root, ObjPath)
+     * @param distinctNouns list of distinct nouns while traversing the pattern SG
+     * @param distinctVerbs list of distinct verbs, adj while traversing the pattern SG
+     */
     public Pattern(Node root,
                       String mergePatternStr, String mergePatternExt,
                       Set<String> distinctNouns, Set<String> distinctVerbs) {
@@ -53,6 +61,10 @@ public class Pattern {
         this.distinctVerbs = distinctVerbs;
     }
 
+    /**
+     * Generate pattern based on SG
+     * @param semanticGraph semantic graph for which pattern needs to be generated
+     */
     public Pattern(SemanticGraph semanticGraph) {
         try {
             this.semanticGraph = semanticGraph;
@@ -102,6 +114,11 @@ public class Pattern {
         }
     }
 
+    /**
+     *
+     * @param word word
+     * @return word's lemma using Word Annotator CoreNLP pipeline
+     */
     public String getWordLemma(String word) {
         String lemma;
         try {
@@ -118,6 +135,9 @@ public class Pattern {
         return lemma;
     }
 
+    /**
+     * set merge pattern string
+     */
     public void setMergePatternStr() {
         final String patternFormat = "{%s}%s{%s}";
 
@@ -136,11 +156,18 @@ public class Pattern {
                 objPatternExt);
     }
 
+    /**
+     *
+     * @param iw get's verb against noun if possible; adds noun to distinct list
+     */
     public void addNoun(IndexedWord iw) {
         if (iw.tag().equals("NN"))
             distinctNouns.add(WordNet.wordNet.getVerbForNoun(iw.toString()));
     }
 
+    /**
+     * storing distinct nouns
+     */
     private void setDistinctNouns() {
         Set<IndexedWord> vertexSet = semanticGraph.vertexSet();
         for (IndexedWord iw : vertexSet) {
@@ -158,6 +185,9 @@ public class Pattern {
         }
     }
 
+    /**
+     * storing distinct verbs
+     */
     private void setDistinctVerbs() {
         Set<IndexedWord> vertexSet = semanticGraph.vertexSet();
         for (IndexedWord iw : vertexSet) {
@@ -175,6 +205,11 @@ public class Pattern {
         }
     }
 
+    /**
+     *
+     * @param path list of edges from SG root to either subject/object i.e. leaf
+     * @return path as string from root to it's leaf; discard labels and "MERGE_TYPED_DEPENDENCIES"
+     */
     private StringBuilder setPatternStr(List<SemanticGraphEdge> path) {
         final String patternFormat = "(%s)-%s>%s";
         StringBuilder pattern = new StringBuilder();
@@ -209,6 +244,11 @@ public class Pattern {
         return pattern;
     }
 
+    /**
+     *
+     * @param path list of edges from SG root to either subject/object i.e. leaf
+     * @return path as string from root to it's leaf; also keeps the label
+     */
     private StringBuilder setPatternExtended(List<SemanticGraphEdge> path) {
         final String patternFormat = "(%s/%s)-%s>%s";
         StringBuilder pattern = new StringBuilder();
@@ -239,6 +279,9 @@ public class Pattern {
         return pattern;
     }
 
+    /**
+     * retrives subj and obj path using SG by computing shortest distance from root node
+     */
     public void setSubjObjPath() {
         List<SemanticGraphEdge> allEdges = semanticGraph.edgeListSorted();
         if (allEdges ==  null || allEdges.isEmpty())

@@ -13,6 +13,14 @@ import java.io.OutputStream;
  * @author DANISH AHMED
  */
 public class CoreNLPAnnotatorUtils {
+    /**
+     *
+     * @param context sentence(s)
+     * @param pipeline CoreNLP pipeline
+     * @param outputFile file path to save annotation
+     * @return annotation; also saves the serialized annotation to specified file
+     * @throws IOException
+     */
     public static Annotation createAndWriteAnnotationToFile(String context, StanfordCoreNLP pipeline, String outputFile) throws IOException {
         Annotation document = new Annotation(context);
         pipeline.annotate(document);
@@ -26,6 +34,11 @@ public class CoreNLPAnnotatorUtils {
         return document;
     }
 
+    /**
+     *
+     * @param annotationFile serialized annotation file
+     * @return coreNLP annotation
+     */
     public static Annotation readAnnotationFromFile(String annotationFile) {
         ProtobufAnnotationSerializer serializer = new ProtobufAnnotationSerializer();
         try {
@@ -36,6 +49,12 @@ public class CoreNLPAnnotatorUtils {
         return null;
     }
 
+    /**
+     *
+     * @param pipeline CoreNLP pipeline
+     * @param context sentence(s)
+     * @return annotation of context based on passed pipeline
+     */
     public static Annotation annotateDocument(StanfordCoreNLP pipeline, String context) {
         Annotation document = new Annotation(context);
         pipeline.annotate(document);

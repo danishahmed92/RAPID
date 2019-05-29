@@ -12,6 +12,11 @@ import java.util.List;
  */
 public class PropertyTripleCollector extends DataStorage{
 
+    /**
+     *
+     * @param property ontology
+     * @param storeToDB process directly or store to db?
+     */
     public void getPropertyTriples(String property, Boolean storeToDB) {
         String queryString = String.format("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
                 "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +

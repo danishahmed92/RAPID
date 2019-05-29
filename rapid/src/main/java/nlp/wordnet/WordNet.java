@@ -28,6 +28,10 @@ public class WordNet {
         }
     }
 
+    /**
+     * Initializing wordnet provided location where it is saved
+     * @throws IOException
+     */
     public WordNet() throws IOException {
         String path = IniConfig.configInstance.wordNet;
         URL url = null;
@@ -43,6 +47,11 @@ public class WordNet {
         dict.open();
     }
 
+    /**
+     *
+     * @param noun noun word
+     * @return verbs against a noun if exist
+     */
     public String getVerbForNoun(String noun) {
         IIndexWord idxWord = dict.getIndexWord(noun, POS.NOUN);
         try {
@@ -68,6 +77,12 @@ public class WordNet {
         }
     }
 
+    /**
+     *
+     * @param word word
+     * @param n number of synonyms to be returned
+     * @return n synonyms for a word
+     */
     public Set<String> getNTopSynonyms(String word, int n) {
         Set<String> synonyms = new HashSet<>();
         POS pos = getBestPOS(word);
@@ -92,6 +107,11 @@ public class WordNet {
         return synonyms;
     }
 
+    /**
+     * used whenever CoreNLP determines wrong POS
+     * @param word
+     * @return returns pos based on gloss frequency
+     */
     public POS getBestPOS(String word) {
         try {
             IIndexWord iwN = dict.getIndexWord(word, POS.NOUN);
@@ -139,6 +159,12 @@ public class WordNet {
         }
     }
 
+    /**
+     *
+     * @param word word
+     * @param pos part of speech
+     * @return IWord - can be used to access synset
+     */
     private IWord getIWord(String word, POS pos) {
         IIndexWord idxWord = dict.getIndexWord(word, pos);
         if (idxWord.getWordIDs() == null || idxWord.getWordIDs().size() == 0)
@@ -148,6 +174,12 @@ public class WordNet {
         return dict.getWord(wordID);
     }
 
+    /**
+     *
+     * @param word word
+     * @param pos part of speech
+     * @return lemma of word
+     */
     public String getLemma(String word, POS pos) {
         IWord iword = getIWord(word, pos);
         if (iword == null)
@@ -156,6 +188,11 @@ public class WordNet {
         return iword.getLemma().length() > 0 ? iword.getLemma() : word;
     }
 
+    /**
+     *
+     * @param word word
+     * @return lemma of word by selecting POS itself based on gloss frequency
+     */
     public String getLemma(String word){
         POS pos = getBestPOS(word);
         if (pos == null)
@@ -163,6 +200,12 @@ public class WordNet {
         return getLemma(word, pos);
     }
 
+    /**
+     *
+     * @param word word
+     * @param pos part of speech
+     * @return definition of the word
+     */
     public String getGloss(String word, POS pos) {
         IWord iword = getIWord(word, pos);
         if (iword == null)
@@ -171,6 +214,11 @@ public class WordNet {
         return iword.getSynset().getGloss();
     }
 
+    /**
+     *
+     * @param word word
+     * @return definition of the word - selects POS itself based on gloss frequency
+     */
     public String getGloss(String word) {
         POS pos = getBestPOS(word);
         if (pos == null)
@@ -179,6 +227,13 @@ public class WordNet {
         return getGloss(word, pos);
     }
 
+    /**
+     *
+     * @param wordsSpaceSeparated words string / sentence
+     * @param removeStopWordsFromGloss removes stop words from the definition (if true)
+     * @param exampleSentence flag to include example sentences from definition or not
+     * @return map of words and it's definitions
+     */
     public HashMap<String, String> getGlossFromString(String wordsSpaceSeparated,
                                                       boolean removeStopWordsFromGloss,
                                                       boolean exampleSentence) {

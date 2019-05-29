@@ -21,6 +21,11 @@ public class DataStorage {
     private String insertRefinedSentenceQuery = "INSERT INTO `property_sentence_coref` (`id_prop_sentence`, `id_prop_triple`, `property_uri`, `sentence`) " +
             "VALUES (?, ?, ?, ?);";
 
+    /**
+     * saves the triple to database obtained against a property
+     * @param soln QuerySolution
+     * @param property ontology
+     */
     protected void storePropertyTriple(QuerySolution soln, String property) {
         String subUri = soln.getResource("s").toString();
         String objUri = soln.getResource("o").toString();
@@ -52,6 +57,12 @@ public class DataStorage {
         }
     }
 
+    /**
+     * inserting extracted sentences from wiki article to database
+     * @param propTripleId against which triple the sentence was extracted
+     * @param property ontology
+     * @param sentence extracted sentence
+     */
     protected void insertSentenceToDB(int propTripleId, String property, String sentence) {
         PreparedStatement prepareStatement = null;
         try {
@@ -66,6 +77,11 @@ public class DataStorage {
         }
     }
 
+    /**
+     * update sentence
+     * @param sentenceId sentence id
+     * @param sentence sentence to update
+     */
     protected void updateTripleSentence(int sentenceId, String sentence) {
         PreparedStatement prepareStatement = null;
         try {
@@ -79,6 +95,11 @@ public class DataStorage {
         }
     }
 
+    /**
+     *
+     * @param sentenceId id of a sentence
+     * @param annotatedFile fileName (location read from config) in which annotated sentence is stored
+     */
     protected void updateAnnotationFile(int sentenceId, String annotatedFile) {
         PreparedStatement prepareStatement = null;
         try {
@@ -92,6 +113,11 @@ public class DataStorage {
         }
     }
 
+    /**
+     *
+     * @param sentenceId id of a sentence
+     * @param annotatedFile fileName (location read from config) in which annotated sentence is stored
+     */
     protected void updateCorefAnnotationFile(int sentenceId, String annotatedFile) {
         PreparedStatement prepareStatement = null;
         try {
@@ -105,6 +131,13 @@ public class DataStorage {
         }
     }
 
+    /**
+     *
+     * @param sentenceId id of a sentence
+     * @param propTripleId id of triple whose sentence was used
+     * @param property ontology
+     * @param sentence modified sentence after mention
+     */
     protected void insertRefinedSentenceToDB(int sentenceId, int propTripleId, String property, String sentence) {
         PreparedStatement prepareStatement = null;
         try {

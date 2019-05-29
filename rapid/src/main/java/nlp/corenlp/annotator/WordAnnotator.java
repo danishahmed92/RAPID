@@ -17,6 +17,9 @@ public class WordAnnotator implements CoreNLP {
     }
 
     @Override
+    /**
+     * pipeline properties required for getting lemma and pos for patterns
+     */
     public Properties setProperties() {
         Properties props = new Properties();
         props.setProperty("annotators", "tokenize,ssplit,pos,lemma,ner");
@@ -24,15 +27,24 @@ public class WordAnnotator implements CoreNLP {
     }
 
     @Override
+    /**
+     * initializing CoreNLP pipeline
+     */
     public StanfordCoreNLP setPipeLine(Properties props) {
         return new StanfordCoreNLP(props);
     }
 
+    /**
+     * setting pipleline and properties
+     */
     private WordAnnotator() {
         this.pipelineWord = setPipeLine(setProperties());
     }
 
     @Override
+    /**
+     * get coreNLP pipeline
+     */
     public StanfordCoreNLP getPipeline() {
         return pipelineWord;
     }

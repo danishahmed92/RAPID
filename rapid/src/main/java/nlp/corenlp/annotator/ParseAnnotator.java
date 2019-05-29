@@ -17,6 +17,9 @@ public class ParseAnnotator implements CoreNLP {
     }
 
     @Override
+    /**
+     * pipeline properties required for 2nd pass annotation
+     */
     public Properties setProperties() {
         Properties props = new Properties();
         props.setProperty("annotators", "tokenize,ssplit,pos,lemma,ner,parse");
@@ -24,15 +27,24 @@ public class ParseAnnotator implements CoreNLP {
     }
 
     @Override
+    /**
+     * initializing CoreNLP pipeline
+     */
     public StanfordCoreNLP setPipeLine(Properties props) {
         return new StanfordCoreNLP(props);
     }
 
+    /**
+     * setting pipleline and properties
+     */
     private ParseAnnotator() {
         this.pipelineParse = setPipeLine(setProperties());
     }
 
     @Override
+    /**
+     * get coreNLP pipeline
+     */
     public StanfordCoreNLP getPipeline() {
         return pipelineParse;
     }

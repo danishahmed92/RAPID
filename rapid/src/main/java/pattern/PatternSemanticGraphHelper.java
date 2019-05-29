@@ -12,6 +12,13 @@ import java.util.*;
  * @author DANISH AHMED on 12/7/2018
  */
 public class PatternSemanticGraphHelper {
+    /**
+     *
+     * @param semanticGraph semantic graph
+     * @param subj subject label
+     * @param obj object label
+     * @return replaces indexedWord's text with %D% and %R% if finds subj and obj label respectively
+     */
     public static SemanticGraph replaceDomainRange(SemanticGraph semanticGraph, String subj, String obj) {
         SemanticGraph sg = new SemanticGraph();
         List<SemanticGraphEdge> allEdges = semanticGraph.edgeListSorted();
@@ -48,6 +55,13 @@ public class PatternSemanticGraphHelper {
         return sg;
     }
 
+    /**
+     * removes edges and add new ones to link nodes and generalize SG
+     * @param semanticGraph semantic graph
+     * @param subj subject label
+     * @param obj object label
+     * @return generalized semantic subgraph
+     */
     public static SemanticGraph pruneGraph(SemanticGraph semanticGraph, String subj, String obj) {
         List<IndexedWord> subjIWList = DependencyTreeUtils.getIndexedWordsFromString(semanticGraph, subj);
         List<IndexedWord> objIWList = DependencyTreeUtils.getIndexedWordsFromString(semanticGraph, obj);
@@ -76,6 +90,12 @@ public class PatternSemanticGraphHelper {
         return semanticGraph;
     }
 
+    /**
+     *
+     * @param semanticGraph semantic graph
+     * @param iWList nodes reflecting entity (subject / object)
+     * @return returns map of edges that has to be "add"ed or "remove"d
+     */
     private static HashMap<String, Set<SemanticGraphEdge>> setEdgesRemovalAddition(SemanticGraph semanticGraph, List<IndexedWord> iWList) {
         HashMap<String, Set<SemanticGraphEdge>> edgeRemoveAddMap = new LinkedHashMap<>();
 
@@ -128,6 +148,11 @@ public class PatternSemanticGraphHelper {
         return edgeRemoveAddMap;
     }
 
+    /**
+     *
+     * @param sgPatterns set of semantic subgraphs generated using subj and obj nodes
+     * @return all semantic subgraphs that do not contain a child node C if it is a root node of another subgraph
+     */
     public static Set<SemanticGraph> removeRootContainSubGraph(Set<SemanticGraph> sgPatterns) {
         if (sgPatterns.size() <= 1)
             return sgPatterns;

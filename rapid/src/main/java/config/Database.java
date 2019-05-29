@@ -22,6 +22,10 @@ public class Database {
 
     public Connection conn;
 
+    /**
+     * Database connection initialization
+     * @throws SQLException
+     */
     public Database() throws SQLException {
         String dbHost = DatabaseConfig.dbConfigInstance.dbHost;
         String dbPort = DatabaseConfig.dbConfigInstance.dbPort;
@@ -52,6 +56,10 @@ class DatabaseConfig {
     String dbUser;
     String dbPassword;
 
+    /**
+     * retrieving db config from configuration file
+     * @throws IOException
+     */
     private DatabaseConfig() throws IOException {
         String CONFIG_FILE = "dbConfig.ini";
         Ini configIni = new Ini(IniConfig.class.getClassLoader().getResource(CONFIG_FILE));

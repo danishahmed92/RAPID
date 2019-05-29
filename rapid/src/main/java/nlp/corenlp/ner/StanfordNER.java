@@ -32,6 +32,10 @@ public class StanfordNER implements NER {
         return nerMap;
     }
 
+    /**
+     * for all the sentences in annotation, it sets the ner map
+     * @param annotation annotated document
+     */
     public void setNerMap(Annotation annotation) {
         List<CoreMap> sentences = DependencyTreeUtils.getSentences(annotation);
         for (CoreMap sentence : sentences) {
@@ -39,6 +43,10 @@ public class StanfordNER implements NER {
         }
     }
 
+    /**
+     * indentifying entities for sentences
+     * @param sentence coreMap sentence - annotated
+     */
     public void setSentenceNerMap(CoreMap sentence) {
         SemanticGraph semanticGraph = DependencyTreeUtils.getDependencyParse(sentence);
         List<IndexedWord> verticesSorted = semanticGraph.vertexListSorted();
@@ -62,6 +70,11 @@ public class StanfordNER implements NER {
         nerMap.remove("O");
     }
 
+    /**
+     *
+     * @param entity entity label
+     * @param entityType it's type / class
+     */
     private void setEntityForType(String entity, String entityType) {
         Set<String> entitiesForType;
         if (nerMap.containsKey(entityType)) {

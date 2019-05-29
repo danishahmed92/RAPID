@@ -24,10 +24,19 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 public class WikiCleaner {
     private List<String> wikiXMLFilesBz2 = new ArrayList<>();
 
+    /**
+     * initialize wiki dump xml file crawler
+     * @throws IOException
+     */
     public WikiCleaner() throws IOException {
         this.wikiXMLFilesBz2 = filesCrawler();
     }
 
+    /**
+     * iterates across all xml files of wiki dump
+     * @return list of wiki dump files
+     * @throws IOException
+     */
     private static List<String> filesCrawler() throws IOException {
         List<String> wikiXMLFilesBz2 = new ArrayList<>();
         Path path = Paths.get(IniConfig.configInstance.wikiFolder + "xml/");
@@ -43,6 +52,11 @@ public class WikiCleaner {
         return wikiXMLFilesBz2;
     }
 
+    /**
+     * Cleans wiki data and simultaneously creates ES index using multithreading
+     * @param args
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
         Indexer elasticSearchIndexer = new Indexer(ElasticSearch.elasticSearchInstance);
         IniConfig config = IniConfig.configInstance;

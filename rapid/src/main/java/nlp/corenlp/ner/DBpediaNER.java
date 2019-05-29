@@ -18,6 +18,7 @@ import java.util.Set;
 /**
  * @author DANISH AHMED
  */
+@Deprecated
 public class DBpediaNER implements NER {
     private final HashMap<String, Set<String>> nerMap = new HashMap<>();
     private Set<String> ignoreStanfordEntityType = new HashSet<String>() {{
@@ -40,6 +41,10 @@ public class DBpediaNER implements NER {
         add("MONEY");
     }};
 
+    /**
+     *
+     * @param annotation annotated document from which entities are recognized
+     */
     public DBpediaNER(Annotation annotation) {
         StanfordNER ner = new StanfordNER(annotation);
         nerMap.putAll(ner.getNerMap());
@@ -47,6 +52,10 @@ public class DBpediaNER implements NER {
         setNerMap(annotation);
     }
 
+    /**
+     *
+     * @param sentence sentence to create annotation and get ner
+     */
     public DBpediaNER(CoreMap sentence) {
         StanfordNER ner = new StanfordNER(sentence);
         nerMap.putAll(ner.getNerMap());
@@ -54,6 +63,10 @@ public class DBpediaNER implements NER {
         setSentenceNerMap(sentence);
     }
 
+    /**
+     * for all the sentences in annotation, it sets the ner map
+     * @param annotation annotated document
+     */
     @Override
     public void setNerMap(Annotation annotation) {
         List<CoreMap> sentences = DependencyTreeUtils.getSentences(annotation);
@@ -62,6 +75,10 @@ public class DBpediaNER implements NER {
         }
     }
 
+    /**
+     * indentifying entities for sentences
+     * @param sentence coreMap sentence - annotated
+     */
     @Override
     public void setSentenceNerMap(CoreMap sentence) {
         SemanticGraph semanticGraph = DependencyTreeUtils.getDependencyParse(sentence);
@@ -94,6 +111,12 @@ public class DBpediaNER implements NER {
         }
     }
 
+    /**
+     * get possible entity types of entity names
+     * using sparql query based on label's frequency
+     * to obtain class of top label
+     * @param entity entity label
+     */
     private void setEntityTypeFromDBpedia(String entity) {
         System.out.println("Entity: " + entity + "\tEntity_END");
         final String queryBIF = "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n" +
@@ -174,6 +197,11 @@ public class DBpediaNER implements NER {
         }
     }
 
+    /**
+     *
+     * @param entity entity label
+     * @param entityType it's type / class
+     */
     private void setEntityForType(String entity, String entityType) {
         Set<String> entitiesForType;
         if (nerMap.containsKey(entityType)) {
@@ -189,6 +217,10 @@ public class DBpediaNER implements NER {
         }
     }
 
+    /**
+     *
+     * @return sentence ner map
+     */
     @Override
     public HashMap<String, Set<String>> getNerMap() {
         return this.nerMap;

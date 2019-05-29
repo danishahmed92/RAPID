@@ -27,6 +27,9 @@ public class CoreferenceAnnotator implements CoreNLP {
     }
 
     @Override
+    /**
+     * pipeline properties required for coreferencing
+     */
     public Properties setProperties() {
         Properties props = new Properties();
         props.setProperty("annotators", "tokenize,ssplit,pos,lemma,ner,parse,mention,coref");
@@ -34,19 +37,34 @@ public class CoreferenceAnnotator implements CoreNLP {
     }
 
     @Override
+    /**
+     * initializing CoreNLP pipeline
+     */
     public StanfordCoreNLP setPipeLine(Properties props) {
         return new StanfordCoreNLP(props);
     }
 
+    /**
+     * setting pipleline and properties
+     */
     private CoreferenceAnnotator() {
         this.pipelineCoreference = setPipeLine(setProperties());
     }
 
     @Override
+    /**
+     * get coreNLP pipeline
+     */
     public StanfordCoreNLP getPipeline() {
         return pipelineCoreference;
     }
 
+    /**
+     *
+     * @param document annotated document of sentence(s)
+     * @param corefLabelSet if mention needs to be replaced with specific label
+     * @return sentences after replacing with mention
+     */
     public List<String> getCoreferenceReplacedSentences(Annotation document, Set<String> corefLabelSet) {
         List<String> corefSentences = new ArrayList<>();
         Map<Integer, CorefChain> clusterIdCorefChainMap = DependencyTreeUtils.getClusterIdCorefChainMap(document);

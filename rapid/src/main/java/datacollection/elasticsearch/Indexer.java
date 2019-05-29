@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author DANISH AHMED on 5/28/2019
+ * @author DANISH AHMED on 9/4/2018
  */
 public class Indexer {
     private ElasticSearch elasticSearchInstance;
@@ -21,6 +21,10 @@ public class Indexer {
         return elasticSearchInstance.client;
     }
 
+    /**
+     * creates ES index / Dataset is created against which indexing will be done
+     * @return returns true on success
+     */
     public Boolean createIndex() {
         Boolean clusterHealthy = false;
         if (clusterHealthy) {

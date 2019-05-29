@@ -17,22 +17,47 @@ import java.util.*;
  * @author DANISH AHMED
  */
 public class DependencyTreeUtils {
+    /**
+     *
+     * @param sentence coreMap sentence (got from annotation)
+     * @return semantic graph
+     */
     public static SemanticGraph getDependencyParse(CoreMap sentence) {
         return sentence.get(SemanticGraphCoreAnnotations.EnhancedDependenciesAnnotation.class);
     }
 
+    /**
+     *
+     * @param sentence coreMap sentence (got from annotation)
+     * @return CoreLabels; all the tokens present in sentence
+     */
     public static List<CoreLabel> getLabelsFromSentence(CoreMap sentence) {
         return sentence.get(CoreAnnotations.TokensAnnotation.class);
     }
 
+    /**
+     *
+     * @param annotation annotated document
+     * @return list of coreMap sentences present in annotation
+     */
     public static List<CoreMap> getSentences(Annotation annotation) {
         return annotation.get(CoreAnnotations.SentencesAnnotation.class);
     }
 
+    /**
+     *
+     * @param document annotated document
+     * @return map of mention's cluster id and corefChain
+     */
     public static Map<Integer, CorefChain> getClusterIdCorefChainMap(Annotation document) {
         return document.get(CorefCoreAnnotations.CorefChainAnnotation.class);
     }
 
+    /**
+     *
+     * @param annotation annotated document
+     * @return list of recovered sentences from annotated document
+     */
     public static List<String> getStringSentences(Annotation annotation) {
         List<String> sentenceList = new LinkedList<>();
         List<CoreMap> sentences = getSentences(annotation);
@@ -44,6 +69,12 @@ public class DependencyTreeUtils {
         return sentenceList;
     }
 
+    /**
+     *
+     * @param clusterIdCorefChainMap corefClustId corefChainMap
+     * @param corefLabelSet any specific lable that should be used if found in mention
+     * @return sets mention (that will be replaced in sentence) against corefClustId
+     */
     public static HashMap<Integer, String> setMentionToUseIfExistInCluster(Map<Integer, CorefChain> clusterIdCorefChainMap, Set<String> corefLabelSet) {
         HashMap<Integer, String> clusterIdResourceMentionMap = new HashMap<>();
         if (corefLabelSet != null && corefLabelSet.size() != 0) {
@@ -63,6 +94,12 @@ public class DependencyTreeUtils {
         return clusterIdResourceMentionMap;
     }
 
+    /**
+     *
+     * @param semanticGraph semantic graph
+     * @param label entity label
+     * @return consecutive nodes that reflects the label in semantic graph
+     */
     public static List<IndexedWord> getIndexedWordsFromString(SemanticGraph semanticGraph, String label) {
         List<IndexedWord> indexedWordList = new LinkedList<>();
         if (label == null || label.isEmpty())

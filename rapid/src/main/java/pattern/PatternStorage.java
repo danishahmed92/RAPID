@@ -15,6 +15,11 @@ import java.util.List;
 
 public class PatternStorage {
 
+    /**
+     * Stores pattern to database
+     * @param annotationFile serialized annotation file of triple sentence
+     * @param pattern pattern object
+     */
     private void storePatternToDB(String annotationFile, Pattern pattern) {
         String[] split = annotationFile.split("_");
         String propertyUri = split[0];
@@ -51,6 +56,11 @@ public class PatternStorage {
         }
     }
 
+    /**
+     * automation to read annotations,
+     * generate patterns for them,
+     * and store it to database
+     */
     public void storePatternsForAllPropertiesAnnotations() {
         String annotationDirectory = IniConfig.configInstance.secondPassAnnotationDir;
         try {

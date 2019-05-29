@@ -18,6 +18,13 @@ import java.util.*;
  * @author DANISH AHMED on 1/13/2019
  */
 public class MentionSentence extends DataStorage {
+    /**
+     *  sentence storage to db, and annotation to file
+     * @param sourceSentence sentence extracted from wiki article
+     * @param fileName file name for saving annotation
+     * @param writeAnnotation decision to write annotation to file
+     * @return
+     */
     public Annotation getCorefSentencesAnnotation(String sourceSentence, String fileName, Boolean writeAnnotation) {
         String[] fileSplit = fileName.split("_");
         String property = fileSplit[0];
@@ -45,6 +52,12 @@ public class MentionSentence extends DataStorage {
         return document;
     }
 
+    /**
+     * extract sentences based on labels
+     * @param document annotated document based on coref pipeline
+     * @param corefLabelSet specific labels that mentions should be replaced with
+     * @return
+     */
     public List<String> getMentionedSentences(Annotation document, Set<String> corefLabelSet) {
         CoreferenceAnnotator coreference = CoreferenceAnnotator.CRInstance;
         List<String> corefSentences = new ArrayList<>();
@@ -54,6 +67,13 @@ public class MentionSentence extends DataStorage {
             return coreference.getCoreferenceReplacedSentences(document, corefLabelSet);
     }
 
+    /**
+     *
+     * @param corefSentences sentences are replacing mention
+     * @param subj subject label
+     * @param obj object label
+     * @return
+     */
     public List<String> filterSentencesWithSubjObj(List<String> corefSentences, String subj, String obj) {
         List<String> newSentences = new ArrayList<>();
         for (String sentence : corefSentences) {
@@ -64,6 +84,13 @@ public class MentionSentence extends DataStorage {
         return newSentences;
     }
 
+    /**
+     * modify sentences with mentions and then filters the sentences
+     * @param property ontology
+     * @param sentenceId id of original sentence (before mention replace) stored in db
+     * @param sentenceMap sentence detail (sentence, subject label, object label)
+     * @param document
+     */
     public void generateRefinedSentence(String property, int sentenceId, HashMap<String, String> sentenceMap, Annotation document) {
         int tripleId = Integer.parseInt(sentenceMap.get("tripleId"));
         String subLabel = sentenceMap.get("subLabel");
@@ -85,6 +112,9 @@ public class MentionSentence extends DataStorage {
         }
     }
 
+    /**
+     * same as above function but does it automatically for all properties
+     */
     public void generateRefinedCorefSentencesForAllProperties() {
         try {
             List<String> properties = PropertyUtils.getAllProperties();
@@ -106,6 +136,9 @@ public class MentionSentence extends DataStorage {
         }
     }
 
+    /**
+     * saving the filtered sentences that were chosen after mention replacement
+     */
     public void saveRefinedCorefSentenceAnnotationForAllProperties() {
         try {
             List<String> properties = PropertyUtils.getAllProperties();

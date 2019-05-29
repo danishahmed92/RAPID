@@ -15,6 +15,11 @@ import java.util.List;
 public class TripleSentenceCollector extends DataStorage {
     private ElasticSearch elasticSearch = new ElasticSearch();
 
+    /**
+     * retrieve potential sentences that could reflect the triple
+     * @param tripleDataMap containing details of the triple (uri and their labels)
+     * @return returns sentences for it
+     */
     public String getCandidateSentences(HashMap<String, String> tripleDataMap) {
         String subUri = tripleDataMap.get("subUri");
         String objUri = tripleDataMap.get("objUri");
@@ -45,6 +50,13 @@ public class TripleSentenceCollector extends DataStorage {
         return sentence;
     }
 
+    /**
+     *
+     * @param subLabel subject label
+     * @param objLabel object label
+     * @param articleSentences wiki article sentence split - can also pass any sentence string that will check label presence
+     * @return sentences concatenated from one label occurrence to another
+     */
     private String getSentencesHavingLabels(String subLabel, String objLabel, String[] articleSentences) {
         Boolean foundSubj = false;
         Boolean foundObj = false;
@@ -77,12 +89,26 @@ public class TripleSentenceCollector extends DataStorage {
         return (String.join(". ", sentences) + ".");
     }
 
+    /**
+     *
+     * @param sentence sentence
+     * @return filters url if exist in sentence
+     */
     public String filterURLFromSentence(String sentence) {
         sentence = sentence.replaceAll("https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,4}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*\\s)", "");
         sentence = sentence.replaceAll("[\\[\\]]","");
         return sentence;
     }
 
+    /**
+     *
+     * @param sentences new sentences will be added to this list
+     * @param subLabel subject label
+     * @param objLabel object
+     * @param articleSentences wiki sentences
+     * @param startIndex position where any label was first occurred
+     * @return list of extenced sentences based on XOR or labels. This allows to collect n next coref sentences
+     */
     private List<String> getExtendedSentences(List<String> sentences, String subLabel, String objLabel, String[] articleSentences, int startIndex) {
         if (startIndex == articleSentences.length)
             return sentences;
@@ -97,10 +123,21 @@ public class TripleSentenceCollector extends DataStorage {
             return sentences;
     }
 
+    /**
+     *
+     * @param sentence sentence
+     * @param str check of substring
+     * @return check if sentence contains a sub string
+     */
     private Boolean sentenceContainsString(String sentence, String str) {
         return sentence.contains(str);
     }
 
+    /**
+     *
+     * @param uri uri of label for which wiki article needs to be retrieved
+     * @return article page of the uri
+     */
     private String getArticleForURI(String uri) {
         GetResponse response = null;
         try {
@@ -113,12 +150,20 @@ public class TripleSentenceCollector extends DataStorage {
         }
     }
 
+    /**
+     *
+     * @param article wiki article
+     * @return article split as string[]
+     */
     private String[] getSentencesOfArticle(String article) {
         if (article == null)
             return null;
         return article.split("\\.\\s|\\s\\*\\s");
     }
 
+    /**
+     * automation for collect triple sentences and store it for each property
+     */
     public void getAndStoreSentencesForAllPropertyTriples() {
         try {
             List<String> properties = PropertyUtils.getAllProperties();
@@ -137,6 +182,9 @@ public class TripleSentenceCollector extends DataStorage {
         }
     }
 
+    /**
+     * storing and selecting sentences based on last occurrence of either subj or obj presence
+     */
     public void narrowAllSentencesByLastOccurrenceAndUpdate() {
         try {
             List<String> properties = PropertyUtils.getAllProperties();
@@ -160,6 +208,13 @@ public class TripleSentenceCollector extends DataStorage {
         }
     }
 
+    /**
+     *
+     * @param sentence sentence from which entity presence will be found
+     * @param subLabel subject label
+     * @param objLabel object label
+     * @return sentence until last occurrence of any entity is found
+     */
     private String narrowSentencesByLastOccurrence(String sentence, String subLabel, String objLabel) {
         int subjLastIndex = sentence.lastIndexOf(subLabel);
         int objLastIndex = sentence.lastIndexOf(objLabel);

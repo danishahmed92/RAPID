@@ -22,6 +22,9 @@ public class ElasticSearch {
     }
     TransportClient client;
 
+    /**
+     * initializing elasticsearch
+     */
     public ElasticSearch() {
         IniConfig config = IniConfig.configInstance;
         Settings settings = Settings.builder().put("client.transport.ignore_cluster_name", true)
@@ -37,6 +40,9 @@ public class ElasticSearch {
         }
     }
 
+    /**
+     * check if elasticsearch server is online
+     */
     private void clusterAlive() {
         ClusterHealthResponse response = client.admin().cluster().prepareHealth()
                 .setWaitForGreenStatus()
@@ -47,6 +53,11 @@ public class ElasticSearch {
         }
     }
 
+    /**
+     * retrieves document for a uri
+     * @param uri uri
+     * @return ES response
+     */
     public GetResponse getDocumentById(String uri) {
         IniConfig config = IniConfig.configInstance;
         String index = config.esDataset;
