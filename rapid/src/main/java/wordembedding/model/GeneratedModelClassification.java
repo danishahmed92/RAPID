@@ -15,6 +15,7 @@ import java.util.List;
 public class GeneratedModelClassification {
     public Word2Vec sourceModel;
     public Word2Vec generatedModel;
+    public String classifierName;
 
     public static GeneratedModelClassification synsetW2VClassification;
     public static GeneratedModelClassification synsetGloveClassification;
@@ -23,17 +24,18 @@ public class GeneratedModelClassification {
     static {
         IniConfig config = IniConfig.configInstance;
 
-        synsetW2VClassification = new GeneratedModelClassification(config.word2vec, config.propertySynsetW2V);
-        synsetGloveClassification = new GeneratedModelClassification(config.glove, config.propertySynsetGlove);
-        synsetFTClassification = new GeneratedModelClassification(config.fastText, config.propertySynsetFT);
+        synsetW2VClassification = new GeneratedModelClassification(config.word2vec, config.propertySynsetW2V, "w2v");
+        synsetGloveClassification = new GeneratedModelClassification(config.glove, config.propertySynsetGlove, "glove");
+        synsetFTClassification = new GeneratedModelClassification(config.fastText, config.propertySynsetFT, "ft");
     }
 
-    private GeneratedModelClassification(String sourceModelPath, String generatedModelPath) {
+    private GeneratedModelClassification(String sourceModelPath, String generatedModelPath, String classifierName) {
         VectorModel vectorModelSource = new VectorModel();
         VectorModel vectorModelGenerated = new VectorModel();
 
         sourceModel = vectorModelSource.setVectorModel(sourceModelPath);
         generatedModel = vectorModelGenerated.setVectorModel(generatedModelPath);
+        this.classifierName = classifierName;
     }
 
     public HashMap<String, Double> getNearestProperties(List<String> wordList, int limit) {

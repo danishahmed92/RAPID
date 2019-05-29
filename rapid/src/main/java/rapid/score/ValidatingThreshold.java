@@ -31,9 +31,9 @@ public class ValidatingThreshold {
         return mean;
     }*/
 
-    private HashMap<String, Double> getThresholdMap(double alpha, double beta) {
-        HashMap<String, List<Double>> propertyTPConfidenceListMap = getConfidenceListMap(alpha, beta, "oke_prop_true_positive");
-        HashMap<String, List<Double>> propertyFPConfidenceListMap = getConfidenceListMap(alpha, beta, "oke_prop_false_positive");
+    private HashMap<String, Double> getThresholdMap(double alpha, double beta, String embdTyp) {
+        HashMap<String, List<Double>> propertyTPConfidenceListMap = getConfidenceListMap(alpha, beta, embdTyp, "oke_prop_true_positive");
+        HashMap<String, List<Double>> propertyFPConfidenceListMap = getConfidenceListMap(alpha, beta, embdTyp, "oke_prop_false_positive");
 
         HashMap<String, Double> propertyThresholdMap = new HashMap<>();
         Set<String> properties = new HashSet<>();
@@ -74,14 +74,13 @@ public class ValidatingThreshold {
         double posPrevMargin = posMean - posVar;
         double negFrontMargin = negMean + negVar;
 
-        double threshold = (negFrontMargin + posPrevMargin) / 2;
-        return threshold;
+        return (negFrontMargin + posPrevMargin) / 2;
     }
 
-    public static HashMap<String, List<Double>> getConfidenceListMap(double alpha, double beta, String table) {
+    public static HashMap<String, List<Double>> getConfidenceListMap(double alpha, double beta, String embdTyp, String table) {
         String selectQuery = String.format("select prop_uri, confidence FROM %s \n" +
-                "                   WHERE alpha = %.1f and beta = %.1f " +
-                "                   ORDER BY prop_uri;", table, alpha, beta);
+                "                   WHERE alpha = %.1f and beta = %.1f " + " and embedding_typ = \"%s\" " +
+                "                   ORDER BY prop_uri;", table, alpha, beta, embdTyp);
         HashMap<String, List<Double>> propertyConfidenceListMap = new HashMap<>();
         Statement statement = null;
         try {
@@ -159,28 +158,29 @@ public class ValidatingThreshold {
         return distinctProperties;
     }
 
-    public void storeThresholds() {
+    public void storeThresholds(String embdTyp) {
         for (double alpha = 1; alpha <= 9; alpha++) {
             for (double beta = 1; beta <= 9; beta++) {
-                HashMap<String, Double> propertyThresholdMap = getThresholdMap(alpha / 10.0, beta / 10.0);
+                HashMap<String, Double> propertyThresholdMap = getThresholdMap(alpha / 10.0, beta / 10.0, embdTyp);
                 for (String property : propertyThresholdMap.keySet()) {
                     double threshold = propertyThresholdMap.get(property);
-                    insertThreshold(alpha, beta, property, threshold);
+                    insertThreshold(alpha, beta, embdTyp, property, threshold);
                 }
             }
         }
     }
 
-    private void insertThreshold(double alpha, double beta, String property, double threshold) {
-        String insertQuery = "INSERT INTO `validating_threshold` (prop_uri, alpha, beta, threshold) " +
-                "VALUES (?, ?, ?, ?);";
+    private void insertThreshold(double alpha, double beta, String embdTyp, String property, double threshold) {
+        String insertQuery = "INSERT INTO `validating_threshold` (embedding_typ, prop_uri, alpha, beta, threshold) " +
+                "VALUES (?, ?, ?, ?, ?);";
         PreparedStatement prepareStatement = null;
         try {
             prepareStatement = Database.databaseInstance.conn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
-            prepareStatement.setString(1, property);
-            prepareStatement.setDouble(2, alpha / 10.0);
-            prepareStatement.setDouble(3, beta / 10.0);
-            prepareStatement.setDouble(4, threshold);
+            prepareStatement.setString(1, embdTyp);
+            prepareStatement.setString(2, property);
+            prepareStatement.setDouble(3, alpha / 10.0);
+            prepareStatement.setDouble(4, beta / 10.0);
+            prepareStatement.setDouble(5, threshold);
 
             prepareStatement.executeUpdate();
         } catch (SQLException e) {
@@ -188,9 +188,9 @@ public class ValidatingThreshold {
         }
     }
 
-    public static double getThreshold(double alpha, double beta, String property) {
+    public static double getThreshold(double alpha, double beta, String embdTyp, String property) {
         String selectQuery = String.format("SELECT threshold from validating_threshold " +
-                "where prop_uri = \"%s\" AND alpha = %.1f and beta = %.1f ;", property, alpha, beta);
+                "where prop_uri = \"%s\" AND alpha = %.1f and beta = %.1f and embedding_typ = \"%s\";", property, alpha, beta, embdTyp);
         double threshold = 0.0;
         Statement statement = null;
         try {
@@ -208,7 +208,7 @@ public class ValidatingThreshold {
 
     public static void main(String[] args) {
         ValidatingThreshold vt = new ValidatingThreshold();
-        vt.storeThresholds();
+        vt.storeThresholds("ft");
     }
 
 }

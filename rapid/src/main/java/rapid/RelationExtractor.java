@@ -369,7 +369,7 @@ public class RelationExtractor {
                         predictionDetailMap.put("embedding", ps.getPredictionDetailMap().get("embedding"));
 
                         double confidence = Double.parseDouble(ps.getPredictionDetailMap().get("confidence"));
-                        double threshold = ValidatingThreshold.getThreshold(alpha, beta, predictedProperty);
+                        double threshold = ValidatingThreshold.getThreshold(alpha, beta, embeddingClassifier.classifierName, predictedProperty);
 
                         if (confidence < threshold)
                             continue;
