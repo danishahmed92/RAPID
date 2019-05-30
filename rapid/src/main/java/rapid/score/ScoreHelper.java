@@ -32,6 +32,11 @@ public class ScoreHelper {
         return propertyPatternCountMap;
     }
 
+    /**
+     *
+     * @param property ontology
+     * @return map of property with it's stats of specificity and support
+     */
     public HashMap<String, HashMap<String, String>> getPatternsFreqAndSGPrettyForProperty(String property) {
         return propertyPatternFreqSGMap.get(property);
     }
@@ -40,6 +45,10 @@ public class ScoreHelper {
         return propertyExtendPatternMap;
     }
 
+    /**
+     *
+     * @return returns properties for which pregenerated patterns exist
+     */
     private Set<String> getPropertiesHavingTrainedPatterns() {
         String selectQuery = "SELECT DISTINCT prop_uri from pattern_stats;";
         Set<String> properties = new HashSet<>();
@@ -57,6 +66,9 @@ public class ScoreHelper {
         return properties;
     }
 
+    /**
+     * property map of it's pattern and pattern extended
+     */
     private void setPropertyPatternsExtendMap() {
         Set<String> properties = getPropertiesHavingTrainedPatterns();
         for (String property : properties) {
@@ -80,6 +92,9 @@ public class ScoreHelper {
 
     }
 
+    /**
+     * function to set statistics of support and specificity for pregenrated patterns belonging to properties
+     */
     private void setPropertyPatternFreqSGMap() {
         Set<String> properties = getPropertiesHavingTrainedPatterns();
         for (String property : properties) {
@@ -118,6 +133,9 @@ public class ScoreHelper {
         }
     }
 
+    /**
+     * number of patterns exist for a property
+     */
     private void setPropertyPatternCountMap() {
         String supportQuery = "SELECT prop_uri, count(id_prop_pattern) as pcount from property_pattern group by prop_uri;";
         Statement statement = null;
@@ -134,6 +152,11 @@ public class ScoreHelper {
         }
     }
 
+    /**
+     *
+     * @param sgPretty serialized pattern
+     * @return narrowed pattern with labels removed
+     */
     public static String removeWordsFromSGPretty(String sgPretty) {
         String[] split = sgPretty.split("/");
         StringBuilder removedSG = new StringBuilder();

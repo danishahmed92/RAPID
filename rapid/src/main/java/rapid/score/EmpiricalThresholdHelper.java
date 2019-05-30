@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.util.*;
 
 public class EmpiricalThresholdHelper {
+    @Deprecated
     public static double calculateThreshold(List<Double> randomVariableList) {
         double threshold = 1;
         double mean = Utils.mean(randomVariableList.toArray());
@@ -36,10 +37,18 @@ public class EmpiricalThresholdHelper {
 //        obs.
 //    }
 
+    @Deprecated
     private static double gaussianMLE(double randomVariable, double mean, double variance) {
         return (1/Math.sqrt(2 * Math.PI * variance)) * Math.exp(-(Math.pow(randomVariable - mean, 2)/(2 * variance)));
     }
 
+    /**
+     *
+     * @param alpha alpha
+     * @param beta beta
+     * @param embdTyp embedding classifier
+     * @return property threshold map got from embedding; gets from db
+     */
     public static HashMap<String, Double> getThresholdMap(double alpha, double beta, String embdTyp) {
         HashMap<String, List<Double>> propertyTPConfidenceListMap = getConfidenceListMap(alpha, beta, "oke_prop_true_positive", embdTyp);
         HashMap<String, List<Double>> propertyFPConfidenceListMap = getConfidenceListMap(alpha, beta, "oke_prop_false_positive", embdTyp);
@@ -63,6 +72,12 @@ public class EmpiricalThresholdHelper {
         return propertyThresholdMap;
     }
 
+    /**
+     *
+     * @param tpConfidences all true positive values
+     * @param fpConfidences all false positive values
+     * @return calculates threshold using evaluation stats
+     */
     private static double calculateThresholdTPFP(List<Double> tpConfidences, List<Double> fpConfidences) {
         double posMean = Utils.mean(tpConfidences.toArray());
         double posVar = Utils.variance(tpConfidences.toArray());
@@ -86,6 +101,14 @@ public class EmpiricalThresholdHelper {
         return (negFrontMargin + posPrevMargin) / 2;
     }
 
+    /**
+     *
+     * @param alpha alpha
+     * @param beta beta
+     * @param table tp / fb table of db
+     * @param embdTyp embedding classifier
+     * @return list of tp/fp values for a property; got during evaluation
+     */
     public static HashMap<String, List<Double>> getConfidenceListMap(double alpha, double beta, String table, String embdTyp) {
         String selectQuery = String.format("select prop_uri, confidence FROM %s \n" +
                 "                   WHERE alpha = %.1f and beta = %.1f " + " and embedding_typ = \"%s\" " +
@@ -115,6 +138,13 @@ public class EmpiricalThresholdHelper {
         return propertyConfidenceListMap;
     }
 
+    /**
+     * Stores evaluation FN values for a property to db
+     * @param alpha alpha
+     * @param beta beta
+     * @param embdTyp embedding classifier
+     * @param propFalseNegCountMap false negative count for a property during evaluation
+     */
     public static void storeFalseNegative(double alpha, double beta, String embdTyp, HashMap<String, Integer> propFalseNegCountMap) {
         for (String property : propFalseNegCountMap.keySet()) {
             String insertQuery = "INSERT INTO `oke_prop_false_negative` (alpha, beta, embedding_typ, " +
@@ -141,6 +171,14 @@ public class EmpiricalThresholdHelper {
         }
     }
 
+    /**
+     * Stores TP and FP values from evaluation to their respective tables
+     * @param table TP/FP table
+     * @param alpha alpha
+     * @param beta beta
+     * @param embdTyp embedding classifier
+     * @param propTruePosi property -> List<confidence/embedding, scores>
+     */
     public static void storePredictionScore(String table, double alpha, double beta,
                                             String embdTyp,
                                             HashMap<String, List<HashMap<String, Double>>> propTruePosi) {
@@ -176,6 +214,7 @@ public class EmpiricalThresholdHelper {
         }
     }
 
+    @Deprecated
     public static Set<String> getPropertiesHavingConfidence(double alpha, double beta) {
         String selectQuery = String.format("SELECT fp.prop_uri from oke_prop_false_positive fp " +
                 "inner join oke_prop_true_positive tp ON fp.prop_uri = tp.prop_uri " +
@@ -195,6 +234,10 @@ public class EmpiricalThresholdHelper {
         return distinctProperties;
     }
 
+    /**
+     * stores threshold to db for all properties automatically
+     * @param embdTyp embedding classifier
+     */
     public void storeThresholds(String embdTyp) {
         for (double alpha = 1; alpha <= 9; alpha++) {
             for (double beta = 1; beta <= 9; beta++) {
@@ -207,6 +250,14 @@ public class EmpiricalThresholdHelper {
         }
     }
 
+    /**
+     * inserting threshold to DB
+     * @param alpha alpha
+     * @param beta beta
+     * @param embdTyp embedding classifier
+     * @param property ontology
+     * @param threshold threshold value
+     */
     private void insertThreshold(double alpha, double beta, String embdTyp, String property, double threshold) {
         String insertQuery = "INSERT INTO `validating_threshold` (embedding_typ, prop_uri, alpha, beta, threshold) " +
                 "VALUES (?, ?, ?, ?, ?);";
@@ -225,6 +276,14 @@ public class EmpiricalThresholdHelper {
         }
     }
 
+    /**
+     *
+     * @param alpha alpha
+     * @param beta beta
+     * @param embdTyp embedding classifier
+     * @param property property
+     * @return threshold of a property using alpha beta params
+     */
     public static double getThreshold(double alpha, double beta, String embdTyp, String property) {
         String selectQuery = String.format("SELECT threshold from validating_threshold " +
                 "where prop_uri = \"%s\" AND alpha = %.1f and beta = %.1f and embedding_typ = \"%s\";", property, alpha, beta, embdTyp);

@@ -25,6 +25,14 @@ public class ForskipoSemanticSimilarity extends MatrixForwardSkipping{
     private Word2Vec embeddingModel;
     private StringMetric similarityMetric = StringMetrics.cosineSimilarity();
 
+    /**
+     *
+     * @param seqComp subsequence to be compared (subj/obj path from root); of pregenerated pattern
+     * @param seqIn subsequence to be compared (subj/obj path from root); of pattern generated from input sentence
+     * @param rootComp root of pregenerated pattern
+     * @param rootIn root of input pattern
+     * @param embeddingClassifier embedding classifier to use (w2v / glove / ft)
+     */
     public ForskipoSemanticSimilarity(String seqComp, String seqIn, String rootComp, String rootIn, GeneratedModelClassification embeddingClassifier) {
         this.seqComp = seqComp;
         this.seqIn = seqIn;
@@ -34,6 +42,10 @@ public class ForskipoSemanticSimilarity extends MatrixForwardSkipping{
         this.embeddingModel = embeddingClassifier.sourceModel;
     }
 
+    /**
+     * given 2 sequences (path of either subject or object), it calculates semantic similarity using forward matrix
+     * @return returns similarity score of 2 sequences by using FSS algorithm
+     */
     public double getSequenceSimilarity() {
         if (seqComp != null && seqIn != null) {
             seqComp = seqComp.replaceAll("\\{", "");
@@ -68,11 +80,20 @@ public class ForskipoSemanticSimilarity extends MatrixForwardSkipping{
         }
     }
 
+    /**
+     *
+     * @param embeddingScore score from embedding classifier
+     * @return normalized score
+     */
     private double normalizeEmbeddingScore(double embeddingScore) {
         return (embeddingScore + 1) / (2);
     }
 
-
+    /**
+     *
+     * @param sequence pattern sequence; so it can be transformed for sequence alignment (matrix)
+     * @return position - sequence detail map
+     */
     private HashMap<Integer, HashMap<String, String>> parseSequence(String sequence) {
         HashMap<Integer, HashMap<String, String>> matrixIndexSeqDetailMap = new LinkedHashMap<>();
 
@@ -119,11 +140,21 @@ public class ForskipoSemanticSimilarity extends MatrixForwardSkipping{
         return matrixIndexSeqDetailMap;
     }
 
+    /**
+     *
+     * @param posSeq part of sequence having label
+     * @return label (that was appended with POS in our pattern)
+     */
     private String getLabelFromPOSSeq(String posSeq) {
         String[] split = posSeq.split("/");
         return split[1];
     }
 
+    /**
+     *
+     * @param posSeq part of sequence having label / %D% / %R%
+     * @return transformed string that is used for matrix population
+     */
     private String getPOSFromPOSSeq(String posSeq) {
         String[] split = posSeq.split("/");
 
@@ -155,6 +186,10 @@ public class ForskipoSemanticSimilarity extends MatrixForwardSkipping{
         return pos;
     }
 
+    /**
+     * populate matix using formula (double value for each block)
+     * @return matrix with each block possessing similarity value of aligned comp-in pattern subpart
+     */
     private double[][] formulateMatrix() {
         HashMap<Integer, HashMap<String, String>> columnMatrix;
         HashMap<Integer, HashMap<String, String>> rowMatrix;
@@ -213,10 +248,20 @@ public class ForskipoSemanticSimilarity extends MatrixForwardSkipping{
         return matrix;
     }
 
+    /**
+     *
+     * @param matrixBlockValue similarity score of subpart pattern (comp, in)
+     * @return normalized similarity value
+     */
     private double normalizeValue(double matrixBlockValue) {
         return (matrixBlockValue + 0.25) / (3.75 + 0.25);  // since our values can range from -0.25 to +3.75
     }
 
+    /**
+     *
+     * @param str typed dependency / POS
+     * @return space separated typed dependency / POS so it can be transformed into vector for calculating cosine similarity
+     */
     private String transformForCosine(String str) {
         if (str.contains(" ")) {
             String[] split = str.split(" ");

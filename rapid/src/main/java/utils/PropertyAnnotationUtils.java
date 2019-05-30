@@ -12,6 +12,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 public class PropertyAnnotationUtils {
+    /**
+     *
+     * @param propertyUri property
+     * @return serialized annotation map of subj and obj label
+     */
     public static HashMap<String, HashMap<String, String>> getAnnotationLabelMap(String propertyUri) {
         HashMap<String, HashMap<String, String>> annotationLabelMap = new LinkedHashMap<>();
         final String QUERY_TRIPLE_LABELS_FOR_PROPERTY = "SELECT psr.id_ps_coref, pt.id_prop_triple, psr.property_uri, pt.subj_label, pt.obj_label from property_sentence_coref AS psr \n" +
@@ -43,6 +48,12 @@ public class PropertyAnnotationUtils {
         return annotationLabelMap;
     }
 
+    /**
+     *
+     * @param propertyUri property
+     * @param annotationDir serialized annotation directory
+     * @return
+     */
     public static List<String> getAnnotationFilesForProperty(String propertyUri, String annotationDir) {
         String annotationFolder = annotationDir + propertyUri + "/";
         if (Files.exists(Paths.get(annotationFolder))) {

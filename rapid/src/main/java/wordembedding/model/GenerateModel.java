@@ -28,6 +28,7 @@ public class GenerateModel {
      * it merge all the strings (repeated words)
      * and calculate mean vector of the strings
      * then write float values of mean against that key
+     * @outputFile PEM file name
      * */
     public void generateVectorModel (String outputFile) {
         try {

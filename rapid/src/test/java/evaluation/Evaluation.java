@@ -18,6 +18,7 @@ public class Evaluation {
     private HashMap<Integer, HashMap<String, String>> patternPredictionMap = new HashMap<>();
 
     private HashMap<String, List<Double>> propertyScoreListMap = new HashMap<>();
+    @Deprecated
     private HashMap<String, Double> propertyThresholdMap = new HashMap<>();
 
     private String resultFile;
@@ -29,13 +30,14 @@ public class Evaluation {
         this.resultFile = resultFile;
 
         setPatternPredictionsFromResultFile();
-        setPropertyThresholdMap();
+//        setPropertyThresholdMap();
     }
 
     public HashMap<Integer, HashMap<String, String>> getPatternPredictionMap() {
         return patternPredictionMap;
     }
 
+    @Deprecated
     private void setPropertyThresholdMap() {
         for (String property : propertyScoreListMap.keySet()) {
             List<Double> randomVariablesList = propertyScoreListMap.get(property);

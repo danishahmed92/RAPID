@@ -14,22 +14,53 @@ import java.util.*;
  * @author DANISH AHMED
  */
 public class VectorModelUtils extends BasicModelUtils {
+    /**
+     *
+     * @param vecModel Embedding Classifier Model (DL4j); initialized with (w2v/ft/glove)
+     * @return vector configuration used to train embedding model
+     */
     public static VectorsConfiguration getModelConfiguration(Word2Vec vecModel) {
         return vecModel.getConfiguration();
     }
 
+    /**
+     *
+     * @param vecModel Embedding Classifier Model (DL4j); initialized with (w2v/ft/glove)
+     * @param word word
+     * @param n limit of nearest words
+     * @return N nearest words based on similarity score
+     */
     public static Collection<String> nNearestWords(Word2Vec vecModel, String word, int n) {
         return vecModel.wordsNearest(word, n);
     }
 
+    /**
+     *
+     * @param vecModel Embedding Classifier Model (DL4j); initialized with (w2v/ft/glove)
+     * @param vecArray word's vector row
+     * @param n limit of nearest words
+     * @return N nearest words based on similarity score
+     */
     public static Collection<String> nNearestWords(Word2Vec vecModel, INDArray vecArray, int n) {
         return vecModel.wordsNearest(vecArray, n);
     }
 
+    /**
+     *
+     * @param vecModel Embedding Classifier Model (DL4j); initialized with (w2v/ft/glove)
+     * @param words list of words
+     * @return means vector of words
+     */
     public static INDArray getMeanVecFromWordList(Word2Vec vecModel, List<String> words) {
         return vecModel.getWordVectorsMean(words);
     }
 
+    /**
+     *
+     * @param vec1 vector 1 (word's vector representation)
+     * @param vec2 vector 2 (word's vector representation)
+     * @return cosine similarity score between two vectors
+     */
     public static double getSimilarity(INDArray vec1, INDArray vec2) {
         if (vec1 != null && vec2 != null) {
             if (vec1.equals(vec2)) {
@@ -41,15 +72,36 @@ public class VectorModelUtils extends BasicModelUtils {
         }
     }
 
+    /**
+     *
+     * @param vecModel Embedding Classifier Model (DL4j); initialized with (w2v/ft/glove)
+     * @param word word
+     * @param vec2 word's (different) vector representation
+     * @return similarity score between string word and vector representation of a word
+     */
     public static double getSimilarity(Word2Vec vecModel, String word, INDArray vec2) {
         INDArray vec1 = vecModel.getWordVectorMatrix(word);
         return getSimilarity(vec1, vec2);
     }
 
+    /**
+     *
+     * @param vecModel Embedding Classifier Model (DL4j); initialized with (w2v/ft/glove)
+     * @param word1 word 1
+     * @param word2 word 2
+     * @return similarity of two words
+     */
     public static double getSimilarity(Word2Vec vecModel, String word1, String word2) {
         return vecModel.similarity(word1, word2);
     }
 
+    /**
+     *
+     * @param vecModel Embedding Classifier Model (DL4j); initialized with (w2v/ft/glove)
+     * @param words vector representation of word
+     * @param top limit N nearest
+     * @return nearest words and their similarity score w.r.t provided input word
+     */
     public HashMap<String, Double> vectorNearest(Word2Vec vecModel, INDArray words, int top) {
         this.init(vecModel.getLookupTable());
         if (this.lookupTable instanceof InMemoryLookupTable) {
@@ -93,6 +145,12 @@ public class VectorModelUtils extends BasicModelUtils {
         }
     }
 
+    /**
+     *
+     * @param results words and their similarity score
+     * @param limit limit N nearest
+     * @return only top N nearest words and eliminates the rest
+     */
     protected HashMap<String, Double> getNSimilarity(List<BasicModelUtils.WordSimilarity> results, int limit) {
         HashMap<String, Double> wordSimilarityMap = new LinkedHashMap<>();
         for (int i = 0; i < results.size(); i++) {
@@ -104,6 +162,12 @@ public class VectorModelUtils extends BasicModelUtils {
         return wordSimilarityMap;
     }
 
+    /**
+     *
+     * @param vec vector representation of word
+     * @param N Limit N nearest
+     * @return socres list
+     */
     protected List<Double> getTopN(INDArray vec, int N) {
         BasicModelUtils.ArrayComparator comparator = new BasicModelUtils.ArrayComparator();
         PriorityQueue<Double[]> queue = new PriorityQueue(vec.rows(), comparator);

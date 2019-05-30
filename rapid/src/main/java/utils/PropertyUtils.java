@@ -14,6 +14,11 @@ import java.util.List;
  * @author DANISH AHMED on 1/10/2019
  */
 public class PropertyUtils {
+    /**
+     *
+     * @return all properties for which RAPID pre-generated patterns
+     * @throws SQLException
+     */
     public static List<String> getAllProperties() throws SQLException {
         String DISTINCT_PROPERTIES = "SELECT DISTINCT `prop_uri` FROM property ORDER BY `prop_uri` ASC";
         Statement statement = Database.databaseInstance.conn.createStatement();
@@ -26,6 +31,11 @@ public class PropertyUtils {
         return properties;
     }
 
+    /**
+     *
+     * @param property property
+     * @return triples stored in db against property
+     */
     public static HashMap<Integer, HashMap<String, String>> getTriplesForProperty(String property) {
         HashMap<Integer, HashMap<String, String>> tripleIdDataMap = new LinkedHashMap<>();
         String queryString = String.format("SELECT * from property_triple where property_uri = \"%s\" order by id_prop_triple ASC;", property);
@@ -57,6 +67,11 @@ public class PropertyUtils {
         return tripleIdDataMap;
     }
 
+    /**
+     *
+     * @param property property
+     * @return sentences satisfying triples that are against property
+     */
     public static HashMap<Integer, HashMap<String, String>> getSentencesForProperty(String property) {
         HashMap<Integer, HashMap<String, String>> sentenceTripleDataMap = new LinkedHashMap<>();
         String queryString = String.format("select ps.id_property_sentence, ps.id_prop_triple, pt.subj_label, pt.obj_label, sentence from property_sentence ps\n" +
@@ -90,6 +105,11 @@ public class PropertyUtils {
         return sentenceTripleDataMap;
     }
 
+    /**
+     *
+     * @param property property
+     * @return refined corefed sentences satisfying triples that are against property
+     */
     public static HashMap<Integer, String> getRefinedSentencesForProperty(String property) {
         HashMap<Integer, String> idSentenceMap = new LinkedHashMap<>();
         String queryString = String.format("select id_ps_coref, sentence from property_sentence_coref \n" +
@@ -112,6 +132,11 @@ public class PropertyUtils {
         return idSentenceMap;
     }
 
+    /**
+     *
+     * @param property property
+     * @return all serialized annotations stored against a property
+     */
     public static HashMap<Integer, HashMap<String, String>> getAnnotationsForProperty(String property) {
         HashMap<Integer, HashMap<String, String>> sentenceTripleDataMap = new LinkedHashMap<>();
         String queryString = String.format("select ps.id_property_sentence, ps.id_prop_triple, pt.subj_label, pt.obj_label, ps.sentence, ps.annotated_doc from property_sentence ps\n" +
@@ -146,6 +171,11 @@ public class PropertyUtils {
         return sentenceTripleDataMap;
     }
 
+    /**
+     *
+     * @param property property
+     * @return refined sentences for property
+     */
     public static HashMap<Integer, HashMap<String, String>> getCorefSentencesForProperty(String property) {
         HashMap<Integer, HashMap<String, String>> sentenceTripleDataMap = new LinkedHashMap<>();
         String queryString = String.format("select id_ps_coref, id_prop_triple, sentence from property_sentence_coref \n" +

@@ -12,6 +12,14 @@ import java.util.*;
 @RestController
 @RequestMapping("/rapid/api/")
 public class Controller {
+    /**
+     *
+     * @param context sentence(s) to identify property for
+     * @param alpha alpha
+     * @param beta beta
+     * @param embeddingClassifier embedding classifier
+     * @return triple as a map
+     */
     @PostMapping("re/")
     public HashMap<String, Object> extractRelations(@RequestParam(value = "context") String context,
                                         @RequestParam(value = "alpha") double alpha, @RequestParam(value = "beta") double beta,

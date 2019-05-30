@@ -45,6 +45,13 @@ public class RelationExtractor {
     private Set<String> corefSentences = new LinkedHashSet<>();
     private Set<String> entitiesRecognized = new HashSet<>();
 
+    /**
+     *
+     * @param alpha alpha
+     * @param beta beta
+     * @param embeddingClassifier embedding classifier
+     * @param context sentence(s)
+     */
     public RelationExtractor(double alpha, double beta, GeneratedModelClassification embeddingClassifier,
                       String context) {
         this.alpha = alpha;
@@ -58,6 +65,14 @@ public class RelationExtractor {
         setEntitiesRecognized();
     }
 
+    /**
+     *
+     * @param alpha alpha
+     * @param beta beta
+     * @param embeddingClassifier embedding classifier
+     * @param context sentence(s)
+     * @param entityTypeEntitiesMap pass entities explicitly (CoreNLP NER will not be used with this constructor)
+     */
     public RelationExtractor(double alpha, double beta, GeneratedModelClassification embeddingClassifier,
                       String context, HashMap<String, Set<String>> entityTypeEntitiesMap) {
         this.alpha = alpha;
@@ -71,6 +86,9 @@ public class RelationExtractor {
         setEntitiesRecognized();
     }
 
+    /**
+     * set entities using stanford CoreNLP
+     */
     private void setEntitiesRecognized() {
         for (String corefSentence : corefSentenceNERMap.keySet()) {
             HashMap<String, Set<String>> nerMap = corefSentenceNERMap.get(corefSentence);
@@ -86,10 +104,19 @@ public class RelationExtractor {
         return corefSentences;
     }
 
+    /**
+     *
+     * @param corefSentenceNERMap mention replaced sentence NER map
+     */
     public void setCorefSentenceNERMap(HashMap<String, HashMap<String, Set<String>>> corefSentenceNERMap) {
         this.corefSentenceNERMap = corefSentenceNERMap;
     }
 
+    /**
+     *
+     * @param entityTypeEntitiesMap map of entity type/class, and entities belonging to them
+     * @return all entities
+     */
     private Set<String> getAllEntities(HashMap<String, Set<String>> entityTypeEntitiesMap) {
         Set<String> allEntities = new HashSet<>();
         for (String entityType : entityTypeEntitiesMap.keySet()) {
@@ -98,6 +125,12 @@ public class RelationExtractor {
         return allEntities;
     }
 
+    /**
+     *
+     * @param context sentence(s)
+     * @param entityTypeEntitiesMap map of entity type/class, and entities belonging to them
+     * @return coref sentence ner map
+     */
     private HashMap<String, HashMap<String, Set<String>>> getCorefedSentenceNERMap(String context, HashMap<String, Set<String>> entityTypeEntitiesMap) {
         HashMap<String, HashMap<String, Set<String>>> corefSentenceNERMap = new LinkedHashMap<>();
 
@@ -119,6 +152,12 @@ public class RelationExtractor {
         return corefSentenceNERMap;
     }
 
+    /**
+     *
+     * @param corefSent sentence
+     * @param entities entities
+     * @return keep only the sentences that have presence of entities in it
+     */
     private Set<String> filterCorefEntitiesExistence(String corefSent, Set<String> entities) {
         Set<String> entitiesExist = new HashSet<>();
         for (String entity : entities) {
@@ -128,6 +167,11 @@ public class RelationExtractor {
         return entitiesExist;
     }
 
+    /**
+     *
+     * @param context sentence(s)
+     * @return applies coref resolution and creates map of corefed sentence, and entites present in it
+     */
     private HashMap<String, HashMap<String, Set<String>>> getCorefedSentenceNERMap(String context) {
         HashMap<String, HashMap<String, Set<String>>> corefSentenceNERMap = new LinkedHashMap<>();
 
@@ -145,6 +189,11 @@ public class RelationExtractor {
         return corefSentenceNERMap;
     }
 
+    /**
+     *
+     * @param corefedSentence mention replaced sentence
+     * @return new hash map after removing entity types for which RAPID is not trained yet
+     */
     private HashMap<String, Set<String>> nerMapRemovedExcess(String corefedSentence) {
         ParseAnnotator parseAnnotator = ParseAnnotator.PAInstance;
         Annotation nerAnnotation = CoreNLPAnnotatorUtils.annotateDocument(parseAnnotator.getPipeline(), corefedSentence);
@@ -176,6 +225,11 @@ public class RelationExtractor {
         return stanfordNERMap;
     }
 
+    /**
+     *
+     * @param entities entities
+     * @return sentences replaced with entity mentions
+     */
     private List<String> getCorefedSentences(Set<String> entities) {
         CoreferenceAnnotator coreference = CoreferenceAnnotator.CRInstance;
         Annotation document = CoreNLPAnnotatorUtils.annotateDocument(coreference.getPipeline(), context);
@@ -183,6 +237,11 @@ public class RelationExtractor {
         return coreference.getCoreferenceReplacedSentences(document, entities);
     }
 
+    /**
+     *
+     * @param nerMap entities set
+     * @return map of entity type and entities against it; after transforming type w.r.t oke
+     */
     private HashMap<String, Set<String>> transformEntityTypeByCategory(HashMap<String, Set<String>> nerMap) {
         HashMap<String, Set<String>> transformedNERMap = new HashMap<>();
         for (String entityType : nerMap.keySet()) {
@@ -203,6 +262,11 @@ public class RelationExtractor {
         return transformedNERMap;
     }
 
+    /**
+     *
+     * @param nerMap entities
+     * @return map of entity type and entities against it;
+     */
     private HashMap<String, String> getEntityEntityTypeMap(HashMap<String, Set<String>> nerMap) {
         HashMap<String, String> entityEntityTypeMap = new HashMap<>();
         for (String entityType : nerMap.keySet()) {
@@ -215,6 +279,12 @@ public class RelationExtractor {
         return entityEntityTypeMap;
     }
 
+    /**
+     *
+     * @param domain subject entity type
+     * @param range object entity type
+     * @return set of properties that satisfies domain and range
+     */
     private Set<String> getPropertiesValidatingDomainRange(String domain, String range) {
         String query = String.format("select prop_uri from oke_property_class where subj_class = \"%s\" and obj_class = \"%s\";",
                 domain, range);
@@ -234,11 +304,23 @@ public class RelationExtractor {
         return properties;
     }
 
+    /**
+     *
+     * @param corefSentence mentioned sentence
+     * @param subj subject label
+     * @param obj object label
+     * @return generated patterns
+     */
     private List<Pattern> generatePatternFromSentence(String corefSentence, String subj, String obj) {
         PatternGenerator pg = new PatternGenerator(corefSentence);
         return pg.generatePatterns(subj, obj);
     }
 
+    /**
+     * eliminate symmetric properties with certein confidence score
+     * @param propertyPredicationDetailMap property score map
+     * @return filtered property score detail map
+     */
     private HashMap<String, Set<HashMap<String, String>>> filterNonSymmetricProperties(HashMap<String, Set<HashMap<String, String>>> propertyPredicationDetailMap) {
         HashMap<String, Set<HashMap<String, String>>> refinedPropertyPredictionMap = new HashMap<>();
         for (String property : propertyPredicationDetailMap.keySet()) {
@@ -275,6 +357,11 @@ public class RelationExtractor {
         return refinedPropertyPredictionMap;
     }
 
+    /**
+     *
+     * @return property score detail map - Time Efficient - Jaro Wrinkler
+     */
+    @Deprecated
     public HashMap<String, Set<HashMap<String, String>>> extractRelationsStringSimilarity() {
         HashMap<String, Set<HashMap<String, String>>> propertyPredicationDetailMap = new HashMap<>();
 
@@ -331,6 +418,10 @@ public class RelationExtractor {
         return filterNonSymmetricProperties(propertyPredicationDetailMap);
     }
 
+    /**
+     *
+     * @return property score detail map - Accuracy Efficient - Forskipo Semantic Similarity
+     */
     public HashMap<String, Set<HashMap<String, String>>> extractRelationsFSS() {
         HashMap<String, Set<HashMap<String, String>>> propertyPredicationDetailMap = new HashMap<>();
 

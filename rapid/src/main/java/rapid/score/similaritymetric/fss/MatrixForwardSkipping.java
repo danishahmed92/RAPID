@@ -1,6 +1,17 @@
 package rapid.score.similaritymetric.fss;
 
 public class MatrixForwardSkipping {
+    /**
+     * recursive algorithm, idea is to calculate maximum possible sum starting from matrix[row][column]
+     * and save the score to the summation matrix
+     * see thesis section of Forward skipping for further explanation
+     * @param rowIndex matrix row index
+     * @param colIndex matrix col index
+     * @param simMatrix similarity matrix
+     * @param sum current sum using forward skipping approach
+     * @param max maxmium sum obtained using forward skipping
+     * @return
+     */
     private double getMaxSumSubMatrix(int rowIndex, int colIndex, double[][] simMatrix, double sum, double max) {
         if (rowIndex == simMatrix.length - 1 || colIndex == simMatrix[0].length - 1) { // last row
             double localMax = -1;
@@ -24,6 +35,11 @@ public class MatrixForwardSkipping {
         return max;
     }
 
+    /**
+     *
+     * @param matrix similarity matrix
+     * @return new matrix having each block value of maximum possible sum using forward skipping
+     */
     public double[][] generateSummationMatrix(double[][] matrix) {
         double[][] sumM = new double[matrix.length][matrix[0].length];
         for (int i = 0; i < matrix.length; i++) {
@@ -34,6 +50,11 @@ public class MatrixForwardSkipping {
         return sumM;
     }
 
+    /**
+     *
+     * @param matrix scored matrix
+     * @return maximum value of a matrix
+     */
     public double getMaxValueMatrix(double[][] matrix) {
         double max = -100;
         for (double[] aMatrix : matrix) {

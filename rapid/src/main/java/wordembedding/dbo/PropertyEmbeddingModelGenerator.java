@@ -32,15 +32,29 @@ public class PropertyEmbeddingModelGenerator {
         getWordsForProperty();
     }*/
 
+    /**
+     *
+     * @param propertyWordsForMeanMap property, words reflecting property
+     */
     public void setPropertyWordsForMeanMap(HashMap<String, List<String>> propertyWordsForMeanMap) {
         this.propertyWordsForMeanMap = propertyWordsForMeanMap;
     }
 
+    /**
+     *
+     * @param outputModelFile name of property embedding model
+     * @param sourceWordEmbeddingModel embedding classifier to use
+     */
     public void generateVectorModel(String outputModelFile, Word2Vec sourceWordEmbeddingModel) {
         GenerateModel generateModel = new GenerateModel(sourceWordEmbeddingModel, propertyWordsForMeanMap);
         generateModel.generateVectorModel(outputModelFile);
     }
 
+    /**
+     *
+     * @return get labels and comments of properties from DB
+     * @throws SQLException
+     */
     private HashMap<String, HashMap<String, String>> getPropLabelCommentMapDB() throws SQLException {
         String DISTINCT_PROPERTIES = "SELECT DISTINCT `prop_uri`, `prop_label`, `prop_comment` FROM property ORDER BY `prop_uri` ASC";
         Statement statement = Database.databaseInstance.conn.createStatement();
@@ -61,6 +75,12 @@ public class PropertyEmbeddingModelGenerator {
         return propLabelCommentMap;
     }
 
+    /**
+     *
+     * @param labelCommentNoStopWords
+     * @return gloss of words found in label / comments of properties
+     */
+    @Deprecated
     private List<String> getGlossIncludedWordsForMeanVector(String labelCommentNoStopWords) {
         List<String> wordsForMean = new ArrayList<>();
 
@@ -85,6 +105,11 @@ public class PropertyEmbeddingModelGenerator {
         return wordsForMean;
     }
 
+    /**
+     *
+     * @param labelCommentNoStopWords labels and comments for property without stop words
+     * @return list of synonyms
+     */
     private List<String> getSynonymsForMeanVector(String labelCommentNoStopWords) {
         List<String> wordsForMean = new ArrayList<>();
 
@@ -99,6 +124,10 @@ public class PropertyEmbeddingModelGenerator {
         return wordsForMean;
     }
 
+    /**
+     *
+     * @return returns gloss words for each property
+     */
     public HashMap<String, List<String>> getPropertyGlossMapFromDB() {
         String query = "SELECT DISTINCT `prop_uri`, `wordnet_gloss` FROM property ORDER BY `prop_uri` ASC";
         HashMap<String, List<String>> propGlossMap = new LinkedHashMap<>();
@@ -128,6 +157,10 @@ public class PropertyEmbeddingModelGenerator {
         return propGlossMap;
     }
 
+    /**
+     *
+     * @return returns synonyms for each property from DB
+     */
     public HashMap<String, List<String>> getPropertySynsetMapFromDB() {
         String query = "SELECT DISTINCT `prop_uri`, `wordnet_synset` FROM property ORDER BY `prop_uri` ASC";
         HashMap<String, List<String>> propSynsetMap = new LinkedHashMap<>();
@@ -168,6 +201,9 @@ public class PropertyEmbeddingModelGenerator {
         return propSynsetMap;
     }
 
+    /**
+     * function to gather words against properties
+     */
     public void getWordsForProperty() {
         try {
             HashMap<String, HashMap<String, String>> propLabelCommentMap = getPropLabelCommentMapDB();

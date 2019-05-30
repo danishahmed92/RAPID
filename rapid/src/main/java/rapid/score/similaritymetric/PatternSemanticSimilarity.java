@@ -17,6 +17,12 @@ public class PatternSemanticSimilarity {
     private String seqInObj;
     private String rootIn;
 
+    /**
+     *
+     * @param sequenceComparision complete pregenerated pattern
+     * @param sequenceInput complete pattern generated from input
+     * @param embeddingClassifier embedding classifier (w2v / ft/ glove) that FSS will use
+     */
     public PatternSemanticSimilarity(String sequenceComparision, String sequenceInput, GeneratedModelClassification embeddingClassifier) {
         this.sequenceComparision = sequenceComparision;
         this.sequenceInput = sequenceInput;
@@ -25,6 +31,10 @@ public class PatternSemanticSimilarity {
         setSequenceAttributes();
     }
 
+    /**
+     *
+     * @return returns similarity between 2 complete pattern sequences; using FSS algorithm
+     */
     public double getPatternSemanticSimilarity() {
         double subjSimilarity = getSubjPathSemanticSimilarity();
         double objSimilarity = getObjPathSemanticSimilarity();
@@ -32,6 +42,10 @@ public class PatternSemanticSimilarity {
         return (subjSimilarity + objSimilarity) / 2;
     }
 
+    /**
+     *
+     * @return similarity between comp and input pattern's subject path (from root)
+     */
     private double getSubjPathSemanticSimilarity() {
         ForskipoSemanticSimilarity fssSubj = new ForskipoSemanticSimilarity(seqCompSubj, seqInSubj,
                 rootComp, rootIn,
@@ -39,6 +53,10 @@ public class PatternSemanticSimilarity {
         return fssSubj.getSequenceSimilarity();
     }
 
+    /**
+     *
+     * @return similarity between comp and input pattern's object path (from root)
+     */
     private double getObjPathSemanticSimilarity() {
         ForskipoSemanticSimilarity fssObj = new ForskipoSemanticSimilarity(seqCompObj, seqInObj,
                 rootComp, rootIn,
@@ -46,6 +64,9 @@ public class PatternSemanticSimilarity {
         return fssObj.getSequenceSimilarity();
     }
 
+    /**
+     * collecting details from pattern sequence
+     */
     private void setSequenceAttributes() {
         seqCompSubj = sequenceComparision.substring(1, sequenceComparision.indexOf("}"));
         rootComp = sequenceComparision.substring(sequenceComparision.indexOf("}") + 1, sequenceComparision.lastIndexOf("{"));

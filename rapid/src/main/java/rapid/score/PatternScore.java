@@ -35,6 +35,14 @@ public class PatternScore {
 
     private HashMap<String, String> predictionDetailMap = new HashMap<>();
 
+    /**
+     *
+     * @param alpha alpha
+     * @param beta beta
+     * @param pattern pattern to score using params
+     * @param candidateProperties properties that verifies domain and range
+     * @param embeddingClassifier embedding classifier to use for scoring
+     */
     public PatternScore(double alpha, double beta,
                         Pattern pattern, Set<String> candidateProperties,
                         GeneratedModelClassification embeddingClassifier) {
@@ -46,10 +54,11 @@ public class PatternScore {
 
         this.embeddingClassifier = embeddingClassifier;
 
-        setThresholdMap();
+//        setThresholdMap();
     }
 
 //    TODO: replace by alpha and beta after training all thresholds
+    @Deprecated
     private void setThresholdMap() {
         /*String selectQuery = String.format("select prop_uri_lower, mean, sd, variance from property_threshold where alpha = %.1f and beta = %.1f;",
                 alpha, beta);*/
@@ -86,6 +95,10 @@ public class PatternScore {
         return maxMatchedProperty;
     }
 
+    /**
+     *
+     * @return all the verbs and nouns that were encountered while traversing a pattern
+     */
     private List<String> getPatternNounVerbList() {
         List<String> nounsVerbList = new ArrayList<>();
         if (pattern.distinctNouns != null && pattern.distinctNouns.size() > 0) {
@@ -104,6 +117,11 @@ public class PatternScore {
         return nounsVerbList;
     }
 
+    /**
+     *
+     * @param property ontology
+     * @return subcalculation of confidence that relies on embedding w.r.t property embedding model
+     */
     private double patternEmbeddingSimilarityAgainstProperty(String property) {
         List<String> roots = new ArrayList<>();
         roots.add(pattern.root.label.toLowerCase());
@@ -118,7 +136,11 @@ public class PatternScore {
         return rootCosine + nounsVerbCosine;
     }
 
-    // don't give explicit weight to root
+    /**
+     *
+     * @param property property
+     * @return means similarity of traversed node words; from original embedding
+     */
     private double patternWordsPropertyEmbeddingSimilarity(String property) {
         List<String> words = new ArrayList<>();
         words.add(pattern.root.label.toLowerCase());
@@ -130,6 +152,14 @@ public class PatternScore {
 
     }
 
+    /**
+     * Time-Efficient approach
+     * @param property property
+     * @param comparisonPatternMap pattern to compare with
+     * @param embeddingSimilarity score of embedding similarity
+     * @return confidence value of a pattern for property
+     */
+    @Deprecated
     private double getConfidenceOfPatternAgainstProperty(String property, HashMap<String, String> comparisonPatternMap,
                                                          double embeddingSimilarity) {
         double support = Double.parseDouble(comparisonPatternMap.get("support"));
@@ -166,6 +196,14 @@ public class PatternScore {
         return (confidence - 0) / (3 - 0);  // normalizing value
     }
 
+    /**
+     * Accuracy Efficient approach
+     * Uses FSS algorithm and extended labels
+     * @param property property
+     * @param comparisonPatternMap pattern to compare with
+     * @param embeddingSimilarity embedding score
+     * @return confidence value of a pattern for property
+     */
     private double getExtendedPatternConfidenceForProperty(String property, HashMap<String, String> comparisonPatternMap,
                                                          double embeddingSimilarity) {
         double support = Double.parseDouble(comparisonPatternMap.get("support"));
@@ -199,6 +237,9 @@ public class PatternScore {
         return confidence;  // return without normalization
     }
 
+    /**
+     * Time efficient approach to select which property resulted in max confidence
+     */
     public void calculateMaxProperty() {
         confidence = -1;
         maxMatchedProperty = "";
@@ -245,6 +286,9 @@ public class PatternScore {
         return (embeddingScore + 1) / (2);
     }
 
+    /**
+     * Accuracy Efficient approach to select which property resulted in max confidence
+     */
     public void calculateMaxPropertyFSS() {
         confidence = -2;
         maxMatchedProperty = "";
