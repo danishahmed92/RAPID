@@ -37,6 +37,7 @@ public class MatrixForwardSkipping {
 
     /**
      *
+     * @deprecated
      * @param matrix similarity matrix
      * @return new matrix having each block value of maximum possible sum using forward skipping
      */
@@ -48,6 +49,34 @@ public class MatrixForwardSkipping {
             }
         }
         return sumM;
+    }
+
+    /**
+     *
+     * @param matrix similarity matrix
+     * @return new matrix having each block value of maximum possible sum using forward skipping
+     */
+    public double[][] generateSummationMatrixOptimized(double[][] matrix) {
+        int row = matrix.length;
+        int col = matrix[0].length;
+
+        double[][] sumMatrix = new double[row][col];
+        for (int i = 0; i < row; i++)
+            sumMatrix[i][col - 1] = matrix[i][col - 1];
+        for (int j = 0; j < col; j++)
+            sumMatrix[row - 1][j] = matrix[row - 1] [j];
+
+        for (int i = row - 2; i >= 0; i--) {
+            for (int j = 0; j < col - 1; j++) {
+                double max = -99;
+                for (int k = j + 1; k < col; k++) {
+                    if (matrix[i][j] + sumMatrix[i + 1][k] > max)
+                        max = matrix[i][j] + sumMatrix[i + 1][k];
+                }
+                sumMatrix[i][j] = max;
+            }
+        }
+        return sumMatrix;
     }
 
     /**
@@ -73,7 +102,8 @@ public class MatrixForwardSkipping {
 
         MatrixForwardSkipping mfs = new MatrixForwardSkipping();
 
-        double[][] sumM = mfs.generateSummationMatrix(sm);
+        double[][] sumM = mfs.generateSummationMatrixOptimized(sm);
+//        double[][] sumM = mfs.generateSummationMatrix(sm);
         System.out.println("\nMax value:" + mfs.getMaxValueMatrix(sumM));
     }
 }

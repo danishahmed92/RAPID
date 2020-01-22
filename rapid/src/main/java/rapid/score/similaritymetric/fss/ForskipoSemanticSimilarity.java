@@ -66,7 +66,7 @@ public class ForskipoSemanticSimilarity extends MatrixForwardSkipping{
                 return 0.0;
 
             double[][] similarityMatrix = formulateMatrix();
-            double[][] sumMatrix = generateSummationMatrix(similarityMatrix);
+            double[][] sumMatrix = generateSummationMatrixOptimized(similarityMatrix);
             double rootSim;
 
             try {
