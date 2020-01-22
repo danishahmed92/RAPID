@@ -68,7 +68,7 @@ public class MatrixForwardSkipping {
 
         for (int i = row - 2; i >= 0; i--) {
             for (int j = 0; j < col - 1; j++) {
-                double max = -99;
+                double max = -1;
                 for (int k = j + 1; k < col; k++) {
                     if (matrix[i][j] + sumMatrix[i + 1][k] > max)
                         max = matrix[i][j] + sumMatrix[i + 1][k];
